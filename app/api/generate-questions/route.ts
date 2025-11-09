@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     // Ask AI to generate relevant questions based on the prompt using structured output
     const response = await openai.responses.create({
       model: "gpt-5",
-      reasoning: { effort: "low" },
+      reasoning: { effort: "minimal" },
       input: `You are an expert at analyzing document requirements and generating relevant clarifying questions.
       
       Document type: ${docType}

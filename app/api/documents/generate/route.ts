@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       model: "gpt-5",
       input: prompt,
       instructions: systemPrompt,
-      reasoning: { effort: "medium" },
+      reasoning: { effort: "minimal" },
       text: {
         verbosity: "high",
       },
