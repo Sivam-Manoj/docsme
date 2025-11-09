@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Share2, Loader2, Download, FileText, Image, LogOut, X, Home, Check, Edit2 } from "lucide-react";
+import { Save, Share2, Loader2, Download, FileText, Image, LogOut, X, Home, Check, Edit2, Menu, MoreVertical } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -29,77 +29,86 @@ export function EditorToolbar({
   onDownloadImage,
 }: EditorToolbarProps) {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-2 sm:px-4 shrink-0 shadow-sm">
-      <div className="flex items-center gap-2 flex-1 min-w-0">
-        {/* Close/Home Button */}
+    <header className="h-14 sm:h-16 bg-white border-b border-gray-200 flex items-center justify-between px-3 sm:px-4 shrink-0 shadow-sm relative">
+      {/* Left Section */}
+      <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+        {/* Back Button */}
         <Button
           onClick={() => router.push('/dashboard')}
           variant="ghost"
           size="sm"
-          className="shrink-0 text-gray-600 hover:text-gray-900"
+          className="shrink-0 text-gray-600 hover:text-gray-900 h-8 w-8 sm:h-9 sm:w-auto p-0 sm:px-3"
           title="Back to Dashboard"
         >
-          <X className="w-4 h-4 sm:hidden" />
-          <Home className="w-4 h-4 hidden sm:block sm:mr-2" />
-          <span className="hidden sm:inline">Dashboard</span>
+          <Home className="w-4 h-4" />
+          <span className="hidden sm:inline sm:ml-2">Dashboard</span>
         </Button>
 
-        {/* Document Title with Edit Icon */}
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <Edit2 className="w-4 h-4 text-gray-400 shrink-0" />
+        {/* Document Title */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-1 min-w-0">
+          <Edit2 className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 shrink-0 hidden sm:block" />
           <Input
             value={title || ""}
             onChange={(e) => onTitleChange(e.target.value)}
-            className="flex-1 min-w-0 font-semibold border-0 focus:ring-0 text-sm sm:text-base lg:text-lg px-0 sm:px-3"
+            className="flex-1 min-w-0 font-semibold border-0 focus:ring-0 text-xs sm:text-base px-1 sm:px-3 h-8 sm:h-9"
             placeholder="Document Title"
           />
         </div>
       </div>
 
+      {/* Right Section */}
       <div className="flex gap-1 sm:gap-2 items-center shrink-0">
-        {/* Save Button */}
+        {/* Save Button - Always Visible */}
         <Button
           onClick={onSave}
           disabled={isSaving}
           size="sm"
-          className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+          className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 h-8 sm:h-9 px-2 sm:px-4"
         >
           {isSaving ? (
             <>
-              <Loader2 className="w-4 h-4 sm:mr-2 animate-spin" />
-              <span className="hidden sm:inline">Saving...</span>
+              <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+              <span className="hidden sm:inline ml-2 text-xs sm:text-sm">Saving...</span>
             </>
           ) : isSaved ? (
             <>
-              <Check className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Saved</span>
+              <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline ml-2 text-xs sm:text-sm">Saved</span>
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">Save</span>
+              <Save className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline ml-2 text-xs sm:text-sm">Save</span>
             </>
           )}
         </Button>
         
-        <Button onClick={onToggleShare} variant="outline" size="sm" className="hidden sm:flex">
-          <Share2 className="w-4 h-4 sm:mr-2" />
-          <span className="hidden sm:inline">Share</span>
+        {/* Share Button - Hidden on Mobile */}
+        <Button 
+          onClick={onToggleShare} 
+          variant="outline" 
+          size="sm" 
+          className="hidden md:flex h-9"
+        >
+          <Share2 className="w-4 h-4 mr-2" />
+          <span className="text-sm">Share</span>
         </Button>
 
-        {/* Download with Dropdown */}
-        <div className="relative hidden sm:block">
+        {/* Download - Desktop Only */}
+        <div className="relative hidden lg:block">
           <Button
             onMouseEnter={() => setShowDownloadMenu(true)}
             onMouseLeave={() => setShowDownloadMenu(false)}
             variant="outline"
             size="sm"
+            className="h-9"
           >
-            <Download className="w-4 h-4 sm:mr-2" />
-            <span className="hidden lg:inline">Download</span>
+            <Download className="w-4 h-4 mr-2" />
+            <span className="text-sm">Download</span>
           </Button>
           
           {showDownloadMenu && (
@@ -132,15 +141,80 @@ export function EditorToolbar({
           )}
         </div>
 
-        {/* Logout Button */}
+        {/* Mobile Menu Button */}
+        <div className="relative md:hidden">
+          <Button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </Button>
+          
+          {showMobileMenu && (
+            <>
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setShowMobileMenu(false)}
+              />
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                <button
+                  onClick={() => {
+                    onToggleShare();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3 font-medium"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share Document
+                </button>
+                <div className="border-t my-1" />
+                <button
+                  onClick={() => {
+                    onDownloadPDF();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+                >
+                  <FileText className="w-4 h-4" />
+                  Download as PDF
+                </button>
+                <button
+                  onClick={() => {
+                    onDownloadImage();
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
+                >
+                  <Image className="w-4 h-4" />
+                  Download as Image
+                </button>
+                <div className="border-t my-1" />
+                <button
+                  onClick={() => {
+                    signOut({ callbackUrl: "/" });
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3 text-red-600"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Desktop Logout */}
         <Button
           onClick={() => signOut({ callbackUrl: "/" })}
           variant="ghost"
           size="sm"
-          className="hidden lg:flex text-gray-600 hover:text-gray-900"
+          className="hidden lg:flex text-gray-600 hover:text-gray-900 h-9"
         >
-          <LogOut className="w-4 h-4 sm:mr-2" />
-          <span className="hidden lg:inline">Logout</span>
+          <LogOut className="w-4 h-4 mr-2" />
+          <span className="text-sm">Logout</span>
         </Button>
       </div>
     </header>

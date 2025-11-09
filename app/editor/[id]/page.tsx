@@ -254,12 +254,12 @@ export default function EditorPage({
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="grid lg:grid-cols-[1fr_320px] gap-2 sm:gap-4 p-2 sm:p-4">
+        <div className="grid lg:grid-cols-[1fr_320px] gap-3 sm:gap-4 p-2 sm:p-3 lg:p-4">
           {/* Editor Canvas */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden order-2 lg:order-1">
             {/* Sticky Tiptap Formatting Toolbar */}
             {editorInstance && (
-              <div className="sticky top-0 z-10 bg-white border-b">
+              <div className="sticky top-0 z-20 bg-white border-b">
                 <TiptapToolbar
                   editor={editorInstance}
                   fontSize={document.styling.fontSize}
@@ -310,21 +310,25 @@ export default function EditorPage({
           </div>
 
           {/* Right Panel */}
-          <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-            {/* AI Rewrite Panel */}
-            <AIRewritePanel
-              selectedText={selectedText}
-              isRewriting={isRewriting}
-              onRewrite={handleAIRewrite}
-            />
-
-            {/* Share Panel */}
-            {showShareDialog && (
-              <SharePanel
-                isPublic={document.isPublic}
-                shareableLink={document.shareableLink}
-                onMakePublic={handleShare}
+          <div className="space-y-3 sm:space-y-4 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+            {/* AI Rewrite Panel - Compact on Mobile */}
+            <div className="lg:block">
+              <AIRewritePanel
+                selectedText={selectedText}
+                isRewriting={isRewriting}
+                onRewrite={handleAIRewrite}
               />
+            </div>
+
+            {/* Share Panel - Compact on Mobile */}
+            {showShareDialog && (
+              <div className="lg:block">
+                <SharePanel
+                  isPublic={document.isPublic}
+                  shareableLink={document.shareableLink}
+                  onMakePublic={handleShare}
+                />
+              </div>
             )}
           </div>
         </div>
