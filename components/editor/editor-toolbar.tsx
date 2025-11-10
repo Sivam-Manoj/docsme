@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Share2, Loader2, Download, FileText, Image, LogOut, X, Home, Check, Edit2, Menu, MoreVertical } from "lucide-react";
+import { Save, Share2, Loader2, Download, FileText, Image, LogOut, X, Home, Check, Edit2, Menu, MoreVertical, Mail } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ interface EditorToolbarProps {
   onToggleShare: () => void;
   onDownloadPDF: () => void;
   onDownloadImage: () => void;
+  onEmailShare?: () => void;
 }
 
 export function EditorToolbar({
@@ -27,6 +28,7 @@ export function EditorToolbar({
   onToggleShare,
   onDownloadPDF,
   onDownloadImage,
+  onEmailShare,
 }: EditorToolbarProps) {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -99,10 +101,12 @@ export function EditorToolbar({
         </Button>
 
         {/* Download - Desktop Only */}
-        <div className="relative hidden lg:block">
+        <div 
+          className="relative hidden lg:block"
+          onMouseEnter={() => setShowDownloadMenu(true)}
+          onMouseLeave={() => setShowDownloadMenu(false)}
+        >
           <Button
-            onMouseEnter={() => setShowDownloadMenu(true)}
-            onMouseLeave={() => setShowDownloadMenu(false)}
             variant="outline"
             size="sm"
             className="h-9"
@@ -113,16 +117,14 @@ export function EditorToolbar({
           
           {showDownloadMenu && (
             <div 
-              className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50"
-              onMouseEnter={() => setShowDownloadMenu(true)}
-              onMouseLeave={() => setShowDownloadMenu(false)}
+              className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
             >
               <button
                 onClick={() => {
                   onDownloadPDF();
                   setShowDownloadMenu(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
               >
                 <FileText className="w-4 h-4" />
                 Download as PDF
@@ -132,7 +134,7 @@ export function EditorToolbar({
                   onDownloadImage();
                   setShowDownloadMenu(false);
                 }}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
               >
                 <Image className="w-4 h-4" />
                 Download as Image
@@ -167,8 +169,20 @@ export function EditorToolbar({
                   className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3 font-medium"
                 >
                   <Share2 className="w-4 h-4" />
-                  Share Document
+                  Share Link
                 </button>
+                {onEmailShare && (
+                  <button
+                    onClick={() => {
+                      onEmailShare();
+                      setShowMobileMenu(false);
+                    }}
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3 font-medium"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Document
+                  </button>
+                )}
                 <div className="border-t my-1" />
                 <button
                   onClick={() => {

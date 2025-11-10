@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Eye, Edit2, Trash2, ExternalLink, FileText } from "lucide-react";
+import { Calendar, Eye, Edit2, Trash2, ExternalLink, FileText, Download, Image } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useState } from "react";
 
 /**
  * Modern Document Card Component
@@ -43,12 +44,25 @@ interface DocumentCardProps {
     shareableLink: string;
     views: number;
     createdAt: string;
+    isPublic?: boolean;
   };
   onDelete: (id: string) => void;
   index: number;
 }
 
 export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+
+  const handleDownload = (format: 'pdf' | 'image') => {
+    setShowDownloadMenu(false);
+    
+    // Store download preference in sessionStorage
+    sessionStorage.setItem('autoDownload', format);
+    
+    // Navigate to editor - download will trigger automatically
+    window.location.href = `/editor/${document._id}?download=${format}`;
+  };
+
   return (
     <motion.div
       variants={{
@@ -133,17 +147,63 @@ export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
               </motion.div>
             </Link>
             
-            <Link href={`/shared/${document.shareableLink}`} target="_blank">
+            {/* Download Button with Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setShowDownloadMenu(true)}
+              onMouseLeave={() => setShowDownloadMenu(false)}
+            >
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="hover:bg-violet-50 hover:text-violet-600 hover:border-violet-600 transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-600 transition-all duration-300 shadow-sm hover:shadow-md"
+                  title="Download document"
                 >
-                  <ExternalLink className="w-4 h-4" />
+                  <Download className="w-4 h-4" />
                 </Button>
               </motion.div>
-            </Link>
+              
+              {showDownloadMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute bottom-full right-0 mb-2 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
+                >
+                  <button
+                    onClick={() => handleDownload('pdf')}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Download PDF
+                  </button>
+                  <button
+                    onClick={() => handleDownload('image')}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                  >
+                    <Image className="w-4 h-4" />
+                    Download Image
+                  </button>
+                </motion.div>
+              )}
+            </div>
+            
+            {/* Only show Open Link button when document is public/shared */}
+            {document.isPublic && document.shareableLink && (
+              <Link href={`/shared/${document.shareableLink}`} target="_blank">
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="hover:bg-violet-50 hover:text-violet-600 hover:border-violet-600 transition-all duration-300 shadow-sm hover:shadow-md"
+                    title="Open shared link"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                </motion.div>
+              </Link>
+            )}
             
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Button
@@ -151,6 +211,7 @@ export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
                 size="icon"
                 onClick={() => onDelete(document._id)}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-600 transition-all duration-300 shadow-sm hover:shadow-md"
+                title="Delete document"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>

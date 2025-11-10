@@ -13,6 +13,7 @@ import { AIRewritePanel } from "@/components/editor/ai-rewrite-panel";
 import { SharePanel } from "@/components/editor/share-panel";
 import { TiptapEditor } from "@/components/editor/tiptap-editor";
 import { TiptapToolbar } from "@/components/editor/tiptap-toolbar";
+import { EmailShareModal } from "@/components/editor/email-share-modal";
 
 interface DocumentData {
   _id: string;
@@ -42,6 +43,7 @@ export default function EditorPage({
   const [isRewriting, setIsRewriting] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
   );
@@ -65,6 +67,34 @@ export default function EditorPage({
       fetchDocument();
     }
   }, [resolvedParams, session]);
+
+  // Auto-trigger download if coming from dashboard
+  useEffect(() => {
+    if (!document || !editorInstance) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const downloadFormat = params.get('download');
+    const autoDownload = sessionStorage.getItem('autoDownload');
+
+    if (downloadFormat || autoDownload) {
+      const format = downloadFormat || autoDownload;
+      
+      // Clear the session storage
+      sessionStorage.removeItem('autoDownload');
+      
+      // Remove query param from URL without reload
+      window.history.replaceState({}, '', `/editor/${resolvedParams?.id}`);
+
+      // Trigger download after a short delay to ensure content is rendered
+      setTimeout(() => {
+        if (format === 'pdf') {
+          downloadAsPDF();
+        } else if (format === 'image') {
+          downloadAsImage();
+        }
+      }, 1000);
+    }
+  }, [document, editorInstance]);
 
   const fetchDocument = async () => {
     if (!resolvedParams) return;
@@ -182,26 +212,69 @@ export default function EditorPage({
   };
 
   const downloadAsPDF = async () => {
-    if (!contentRef.current) return;
+    if (!contentRef.current || !document) {
+      toast.error("Document not ready");
+      return;
+    }
+
+    const toastId = toast.loading("Generating PDF...");
 
     try {
-      const canvas = await html2canvas(contentRef.current, {
+      // Wait for any pending renders
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Get the element to convert
+      const element = contentRef.current;
+      
+      // Create canvas with better options
+      const canvas = await html2canvas(element, {
         scale: 2,
-        backgroundColor: document?.styling.backgroundColor || "#ffffff",
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: document.styling?.backgroundColor || "#ffffff",
+        logging: false,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
       });
 
-      const imgData = canvas.toDataURL("image/png");
+      // Convert canvas to image
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      
+      // Calculate dimensions for A4
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Create PDF
       const pdf = new jsPDF({
         orientation: "portrait",
-        unit: "px",
-        format: [canvas.width, canvas.height],
+        unit: "mm",
+        format: "a4",
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-      pdf.save(`${document?.title || "document"}.pdf`);
-      toast.success("PDF downloaded!");
-    } catch (error) {
-      toast.error("Failed to download PDF");
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add more pages if content is longer
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save the PDF
+      const fileName = `${document.title.replace(/[^a-z0-9]/gi, '_') || "document"}.pdf`;
+      pdf.save(fileName);
+      
+      toast.success("PDF downloaded successfully!", { id: toastId });
+    } catch (error: any) {
+      console.error("PDF download error:", error);
+      toast.error(error.message || "Failed to download PDF. Please try again.", { id: toastId });
     }
   };
 
@@ -250,6 +323,7 @@ export default function EditorPage({
         onToggleShare={() => setShowShareDialog(!showShareDialog)}
         onDownloadPDF={downloadAsPDF}
         onDownloadImage={downloadAsImage}
+        onEmailShare={() => setShowEmailModal(true)}
       />
 
       {/* Scrollable Content */}
@@ -333,6 +407,14 @@ export default function EditorPage({
           </div>
         </div>
       </div>
+
+      {/* Email Share Modal */}
+      <EmailShareModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        documentId={resolvedParams?.id || ""}
+        documentTitle={document.title}
+      />
     </div>
   );
 }

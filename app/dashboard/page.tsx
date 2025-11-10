@@ -20,6 +20,7 @@ interface Document {
   shareableLink: string;
   views: number;
   createdAt: string;
+  isPublic?: boolean;
 }
 
 interface UserStats {
