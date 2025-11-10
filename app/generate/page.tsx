@@ -1,24 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  X,
-  Sparkles,
-  Loader2,
-  MessageCircleQuestion,
-  FileCode,
-  Users,
-  Briefcase,
-  FileText,
-  Brain,
-  Zap,
-  ArrowRight,
-  CheckCircle2,
-} from "lucide-react";
+import { X, Sparkles, Loader2, MessageCircleQuestion, FileCode, Users, Briefcase, FileText, Brain, Zap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VoiceRecorder } from "@/components/dashboard/voice-recorder";
+import { TiptapEditor } from "@/components/editor/tiptap-editor";
 import { toast } from "sonner";
 
 type DocType = "ai-editor" | "developer" | "client" | "general";
@@ -46,6 +34,7 @@ export default function GeneratePage() {
   const [generatedDocId, setGeneratedDocId] = useState<string>("");
   const [streamingContent, setStreamingContent] = useState("");
   const [characterCount, setCharacterCount] = useState(0);
+  const streamingViewRef = useRef<HTMLDivElement>(null);
 
   const quickSuggestions = [
     "Technical specification for a mobile app",
@@ -169,6 +158,13 @@ export default function GeneratePage() {
                 fullContent += data.content;
                 setStreamingContent(fullContent);
                 setCharacterCount(fullContent.length);
+                
+                // Auto-scroll to bottom
+                setTimeout(() => {
+                  if (streamingViewRef.current) {
+                    streamingViewRef.current.scrollTop = streamingViewRef.current.scrollHeight;
+                  }
+                }, 50);
               }
 
               if (data.done) {
@@ -221,9 +217,10 @@ export default function GeneratePage() {
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-white to-purple-50 overflow-hidden">
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {/* Close Button */}
         <motion.button
+          key="close-button"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
@@ -236,361 +233,341 @@ export default function GeneratePage() {
         {/* Main Content */}
         {!isGenerating ? (
           <motion.div
+            key="form-content"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="h-full flex items-center justify-center p-4 sm:p-6 md:p-8"
+            className="h-full flex flex-col p-2 sm:p-3 md:p-4 overflow-hidden"
           >
-            <div className="w-full max-w-5xl">
-              {/* Header */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="text-center mb-8"
-              >
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-                  Create Your Document
-                </h1>
-                <p className="text-gray-600 text-lg sm:text-xl">
-                  Powered by GPT-5 with real-time generation
-                </p>
-              </motion.div>
+            {/* Ultra Compact Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-center mb-1.5 shrink-0"
+            >
+              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-0.5">
+                Create Document
+              </h1>
+              <p className="text-gray-600 text-[10px] sm:text-xs">
+                Powered by GPT-5
+              </p>
+            </motion.div>
 
-              {/* Main Card */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-3xl shadow-2xl border-2 border-violet-200 overflow-hidden"
-              >
-                <div className="p-6 sm:p-8 md:p-10 space-y-6">
-                  {/* Question Mode Toggle */}
-                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl border border-violet-200">
-                    <div className="flex items-center gap-3">
-                      <MessageCircleQuestion className="w-5 h-5 text-violet-600" />
-                      <div>
-                        <p className="font-semibold text-gray-900">
-                          Question Mode
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Get guided questions for better results
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setQuestionMode(!questionMode)}
-                      disabled={isGeneratingQuestions}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        questionMode ? "bg-violet-600" : "bg-gray-300"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          questionMode ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Document Type */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-violet-600" />
-                      Document Type
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {docTypes.map((type) => (
-                        <button
-                          key={type.id}
-                          onClick={() => setDocType(type.id as DocType)}
-                          disabled={isGeneratingQuestions}
-                          className={`p-4 rounded-xl border-2 transition-all ${
-                            docType === type.id
-                              ? "border-violet-500 bg-violet-50 shadow-md scale-105"
-                              : "border-gray-200 hover:border-violet-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <type.icon
-                            className={`w-6 h-6 mx-auto mb-2 ${
-                              docType === type.id
-                                ? "text-violet-600"
-                                : "text-gray-500"
-                            }`}
-                          />
-                          <p className="font-semibold text-sm text-gray-900">
-                            {type.label}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {type.desc}
-                          </p>
-                        </button>
-                      ))}
+            {/* Main Card - Ultra Compact */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-violet-200 flex flex-col min-h-0 flex-1 w-full max-w-none"
+            >
+              <div className="p-2 sm:p-3 md:p-3 overflow-y-auto space-y-2 md:space-y-0 md:grid md:grid-cols-12 md:gap-2">
+                {/* Question Mode Toggle - Ultra Compact */}
+                <div className="md:col-span-12 col-span-12 flex items-center justify-between p-1.5 bg-gradient-to-r from-violet-50 to-purple-50 rounded border border-violet-200">
+                  <div className="flex items-start gap-1.5">
+                    <MessageCircleQuestion className="w-3.5 h-3.5 text-violet-600 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-xs text-gray-900">AI Question Mode</p>
+                      <p className="text-[10px] text-gray-600">When enabled, AI asks targeted questions based on your request to craft the best document.</p>
                     </div>
                   </div>
-
-                  {/* Effort Selection */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                      <Brain className="w-4 h-4 text-violet-600" />
-                      Thinking Effort
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {[
-                        { id: "minimal", label: "Minimal", desc: "⚡ 3-5s" },
-                        { id: "low", label: "Low", desc: "🚀 5-10s" },
-                        { id: "medium", label: "Medium", desc: "⚖️ 10-20s" },
-                        { id: "high", label: "High", desc: "🧠 20-40s" },
-                      ].map((opt) => (
-                        <button
-                          key={opt.id}
-                          onClick={() => setEffort(opt.id)}
-                          disabled={isGeneratingQuestions}
-                          className={`p-3 rounded-xl border-2 transition-all ${
-                            effort === opt.id
-                              ? "border-blue-500 bg-blue-50 shadow-md"
-                              : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <p className="font-semibold text-sm text-gray-900">
-                            {opt.label}
-                          </p>
-                          <p className="text-xs text-gray-500">{opt.desc}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Verbosity Selection */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-violet-600" />
-                      Content Detail
-                    </label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {[
-                        { id: "low", label: "Concise", desc: "📝 Brief" },
-                        {
-                          id: "medium",
-                          label: "Balanced",
-                          desc: "📄 Standard",
-                        },
-                        {
-                          id: "high",
-                          label: "Detailed",
-                          desc: "📚 Comprehensive",
-                        },
-                      ].map((opt) => (
-                        <button
-                          key={opt.id}
-                          onClick={() => setVerbosity(opt.id)}
-                          disabled={isGeneratingQuestions}
-                          className={`p-3 rounded-xl border-2 transition-all ${
-                            verbosity === opt.id
-                              ? "border-green-500 bg-green-50 shadow-md"
-                              : "border-gray-200 hover:border-green-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          <p className="font-semibold text-sm text-gray-900">
-                            {opt.label}
-                          </p>
-                          <p className="text-xs text-gray-500">{opt.desc}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Prompt Input */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold text-gray-900">
-                      Describe Your Document
-                    </label>
-                    <div className="flex gap-3">
-                      <textarea
-                        placeholder="e.g., Create a technical specification for a React Native mobile app with authentication, real-time updates, and offline support..."
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-violet-500 focus:ring-4 focus:ring-violet-100 outline-none resize-none text-base min-h-[120px]"
-                        disabled={isGeneratingQuestions}
-                        rows={4}
-                      />
-                      <div className="shrink-0">
-                        <VoiceRecorder onTranscript={handleVoiceTranscript} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Generate Button */}
-                  <Button
-                    onClick={
-                      questionMode ? handleGenerateQuestions : handleGenerate
-                    }
-                    disabled={isGeneratingQuestions || !prompt.trim()}
-                    className="w-full h-14 text-lg font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 shadow-xl hover:shadow-2xl transition-all duration-300"
+                  <button
+                    onClick={() => setQuestionMode(!questionMode)}
+                    disabled={isGeneratingQuestions}
+                    className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${questionMode ? "bg-violet-600" : "bg-gray-300"}`}
                   >
-                    {isGeneratingQuestions ? (
-                      <>
-                        <Loader2 className="w-6 h-6 mr-3 animate-spin" />
-                        Generating Questions...
-                      </>
-                    ) : questionMode ? (
-                      <>
-                        <MessageCircleQuestion className="w-6 h-6 mr-3" />
-                        Start with Questions
-                        <ArrowRight className="w-6 h-6 ml-3" />
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-6 h-6 mr-3" />
-                        Generate Document
-                        <ArrowRight className="w-6 h-6 ml-3" />
-                      </>
-                    )}
-                  </Button>
+                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${questionMode ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </div>
 
-                  {/* Quick Suggestions */}
-                  <div className="space-y-3 pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-300 to-transparent"></div>
-                      <p className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-violet-600" />
-                        Quick Suggestions
-                      </p>
-                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-300 to-transparent"></div>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {quickSuggestions.map((suggestion, idx) => (
-                        <motion.button
-                          key={idx}
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setPrompt(suggestion)}
-                          disabled={isGeneratingQuestions}
-                          className="inline-flex items-center text-sm px-4 py-2 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 hover:from-violet-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 font-medium"
-                        >
-                          <Sparkles className="w-3.5 h-3.5 mr-2" />
-                          {suggestion}
-                        </motion.button>
-                      ))}
+                {/* Document Type - Ultra Compact */}
+                <div className="space-y-1 md:col-span-4 col-span-12">
+                  <label className="text-[10px] font-semibold text-gray-900 flex items-center gap-1">
+                    <FileText className="w-3 h-3 text-violet-600" />
+                    Document Type
+                  </label>
+                  <div className="grid grid-cols-4 gap-1">
+                    {docTypes.map((type) => (
+                      <button
+                        key={type.id}
+                        onClick={() => setDocType(type.id as DocType)}
+                        disabled={isGeneratingQuestions}
+                        className={`p-1 rounded border-2 transition-all ${docType === type.id ? "border-violet-500 bg-violet-50" : "border-gray-200 hover:border-violet-300"}`}
+                      >
+                        <type.icon className={`w-3.5 h-3.5 mx-auto mb-0.5 ${docType === type.id ? "text-violet-600" : "text-gray-500"}`} />
+                        <p className="font-semibold text-[10px] text-gray-900">{type.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Thinking Mode */}
+                <div className="space-y-1 md:col-span-4 col-span-12">
+                  <label className="text-[10px] font-semibold text-gray-900 flex items-center gap-1">
+                    <Brain className="w-3 h-3 text-violet-600" />
+                    Thinking Mode
+                  </label>
+                  <p className="text-[10px] text-gray-500">High = slower, best for complex tasks and info points</p>
+                  <div className="grid grid-cols-2 gap-1">
+                    {[
+                      { id: "minimal", label: "Minimal" },
+                      { id: "low", label: "Low" },
+                      { id: "medium", label: "Medium" },
+                      { id: "high", label: "High" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setEffort(opt.id)}
+                        disabled={isGeneratingQuestions}
+                        className={`p-1 rounded border-2 transition-all ${effort === opt.id ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
+                      >
+                        <p className="text-[11px] font-medium">{opt.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Output Size */}
+                <div className="space-y-1 md:col-span-4 col-span-12">
+                  <label className="text-[10px] font-semibold text-gray-900 flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-violet-600" />
+                    Output Size
+                  </label>
+                  <p className="text-[10px] text-gray-500">High = longer text length</p>
+                  <div className="grid grid-cols-3 gap-1">
+                    {[
+                      { id: "low", label: "Low" },
+                      { id: "medium", label: "Medium" },
+                      { id: "high", label: "High" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setVerbosity(opt.id)}
+                        disabled={isGeneratingQuestions}
+                        className={`p-1 rounded border-2 transition-all ${verbosity === opt.id ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-green-300"}`}
+                      >
+                        <p className="text-[11px] font-medium">{opt.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Prompt Input - Ultra Compact */}
+                <div className="space-y-1 md:col-span-12 col-span-12">
+                  <label className="text-[10px] font-semibold text-gray-900">Prompt</label>
+                  <div className="flex gap-1.5">
+                    <textarea
+                      placeholder="Describe your document..."
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:border-violet-500 focus:ring-1 focus:ring-violet-100 outline-none resize-none text-xs"
+                      disabled={isGeneratingQuestions}
+                      rows={2}
+                    />
+                    <div className="shrink-0">
+                      <VoiceRecorder onTranscript={handleVoiceTranscript} />
                     </div>
                   </div>
                 </div>
-              </motion.div>
-            </div>
+
+                {/* Generate Button - Compact */}
+                <Button
+                  onClick={questionMode ? handleGenerateQuestions : handleGenerate}
+                  disabled={isGeneratingQuestions || !prompt.trim()}
+                  className="md:col-span-12 col-span-12 w-full h-9 text-xs font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700"
+                >
+                  {isGeneratingQuestions ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      Loading...
+                    </>
+                  ) : questionMode ? (
+                    <>
+                      <MessageCircleQuestion className="w-3.5 h-3.5 mr-1.5" />
+                      Questions
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                      Generate
+                    </>
+                  )}
+                </Button>
+
+                {/* Quick Suggestions - Ultra Compact (Hidden on small screens) */}
+                <div className="hidden sm:block space-y-1 pt-1.5 border-t border-gray-200 md:col-span-12 col-span-12">
+                  <p className="text-[10px] font-semibold text-gray-700 text-center">Quick Start</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+                    {quickSuggestions.slice(0, 4).map((suggestion, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setPrompt(suggestion)}
+                        disabled={isGeneratingQuestions}
+                        className="text-[10px] px-1.5 py-1 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white rounded shadow-sm font-medium truncate"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         ) : (
-          // Streaming View
+          // Streaming View - Centered & Responsive
           <motion.div
+            key="streaming-view"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="h-full flex flex-col items-center justify-center p-6"
+            className="h-full flex flex-col items-center justify-start p-3 sm:p-4 md:p-6 overflow-hidden"
           >
-            <div className="w-full max-w-4xl">
-              <div className="text-center space-y-6">
+            <div className="w-full max-w-5xl mx-auto space-y-3 sm:space-y-4 flex flex-col h-full">
+              {/* Header Section - Centered */}
+              <div className="text-center space-y-2 sm:space-y-3 shrink-0">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   className="inline-block"
                 >
-                  <Sparkles className="w-16 h-16 text-violet-600" />
+                  <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 text-violet-600" />
                 </motion.div>
 
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-bold text-gray-900">
-                    {generatedDocId
-                      ? "Document Generated!"
-                      : "Generating Your Document..."}
+                <div className="space-y-1">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                    {generatedDocId ? "✨ Document Generated!" : "🚀 Generating Your Document..."}
                   </h2>
-                  <p className="text-lg text-gray-600">
-                    {generatedDocId
-                      ? "Opening editor..."
-                      : `${characterCount} characters generated`}
-                  </p>
+                  <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-600">
+                    <span className="px-2 py-1 bg-violet-100 text-violet-700 rounded-full font-medium">
+                      {characterCount} characters
+                    </span>
+                    {!generatedDocId && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                        Live
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {generatedDocId && (
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200 }}
                     className="flex justify-center"
                   >
-                    <CheckCircle2 className="w-20 h-20 text-green-500" />
-                  </motion.div>
-                )}
-
-                {streamingContent && !generatedDocId && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-2xl shadow-xl p-6 max-h-[400px] overflow-y-auto border-2 border-violet-200"
-                  >
-                    <div
-                      className="text-left prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: streamingContent }}
-                    />
+                    <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-green-500" />
                   </motion.div>
                 )}
               </div>
+
+              {/* Content Preview - Centered & Auto-scrolling */}
+              {streamingContent && !generatedDocId && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-xl shadow-2xl border-2 border-violet-200 flex flex-col min-h-0 flex-1 overflow-hidden"
+                >
+                  <div className="bg-gradient-to-r from-violet-50 to-purple-50 px-3 py-2 border-b border-violet-200 shrink-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-gray-700">📝 Live Preview</p>
+                      <div className="flex items-center gap-2 text-[10px] text-gray-600">
+                        <span className="px-1.5 py-0.5 bg-white rounded border border-violet-200">
+                          {effort}
+                        </span>
+                        <span className="px-1.5 py-0.5 bg-white rounded border border-violet-200">
+                          {verbosity}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div 
+                    ref={streamingViewRef}
+                    className="flex-1 overflow-y-auto p-3 sm:p-4 scroll-smooth"
+                  >
+                    <TiptapEditor
+                      content={streamingContent}
+                      onChange={() => {}}
+                      editable={false}
+                      variant="viewer"
+                      fontSize={14}
+                      fontFamily="Inter, system-ui, Arial"
+                      textColor="#111827"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Completion Message */}
+              {generatedDocId && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 text-center"
+                >
+                  <p className="text-sm sm:text-base font-semibold text-green-900 mb-1">
+                    🎉 Your document is ready!
+                  </p>
+                  <p className="text-xs sm:text-sm text-green-700">
+                    Redirecting to the editor...
+                  </p>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Question Modal */}
+      {/* Question Modal - Compact */}
       <AnimatePresence>
         {showQuestionModal && dynamicQuestions.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
             >
-              <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 text-white p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold">
-                    Question {currentQuestionIndex + 1} of{" "}
-                    {dynamicQuestions.length}
+              <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 text-white p-3 sm:p-4">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <h3 className="text-base sm:text-lg font-bold">
+                    Q {currentQuestionIndex + 1}/{dynamicQuestions.length}
                   </h3>
-                  <Button
+                  <button
                     onClick={() => {
                       setShowQuestionModal(false);
                       setAnswers({});
                       setCurrentQuestionIndex(0);
                       setDynamicQuestions([]);
                     }}
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-white/20"
+                    className="text-white hover:bg-white/20 p-1 rounded"
                   >
-                    <X className="w-5 h-5" />
-                  </Button>
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
                 </div>
                 <div className="flex gap-1">
                   {dynamicQuestions.map((_, idx) => (
                     <div
                       key={idx}
-                      className={`h-2 flex-1 rounded-full transition-all ${
-                        idx <= currentQuestionIndex ? "bg-white" : "bg-white/30"
-                      }`}
+                      className={`h-1.5 flex-1 rounded-full transition-all ${idx <= currentQuestionIndex ? "bg-white" : "bg-white/30"}`}
                     />
                   ))}
                 </div>
               </div>
 
-              <div className="p-6 overflow-y-auto flex-1">
-                <div className="space-y-6">
-                  <label className="text-2xl font-bold text-gray-900 block">
+              <div className="p-3 sm:p-4 overflow-y-auto flex-1">
+                <div className="space-y-3 sm:space-y-4">
+                  <label className="text-base sm:text-lg font-bold text-gray-900 block">
                     {dynamicQuestions[currentQuestionIndex]?.question}
                   </label>
 
                   {dynamicQuestions[currentQuestionIndex]?.type === "yesno" ? (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => {
                           setAnswers({
@@ -598,15 +575,14 @@ export default function GeneratePage() {
                             [dynamicQuestions[currentQuestionIndex].id]: true,
                           });
                         }}
-                        className={`p-6 rounded-2xl border-2 transition-all hover:scale-105 ${
-                          answers[dynamicQuestions[currentQuestionIndex].id] ===
-                          true
-                            ? "border-green-500 bg-green-50 shadow-lg scale-105"
-                            : "border-gray-200 hover:border-green-300 hover:bg-green-50/50"
+                        className={`p-4 sm:p-5 rounded-xl border-2 transition-all ${
+                          answers[dynamicQuestions[currentQuestionIndex].id] === true
+                            ? "border-green-500 bg-green-50 scale-105"
+                            : "border-gray-200 hover:border-green-300"
                         }`}
                       >
-                        <div className="text-5xl mb-3">✅</div>
-                        <p className="font-bold text-lg text-gray-900">Yes</p>
+                        <div className="text-3xl sm:text-4xl mb-2">✅</div>
+                        <p className="font-bold text-sm sm:text-base text-gray-900">Yes</p>
                       </button>
                       <button
                         onClick={() => {
@@ -615,37 +591,28 @@ export default function GeneratePage() {
                             [dynamicQuestions[currentQuestionIndex].id]: false,
                           });
                         }}
-                        className={`p-6 rounded-2xl border-2 transition-all hover:scale-105 ${
-                          answers[dynamicQuestions[currentQuestionIndex].id] ===
-                          false
-                            ? "border-red-500 bg-red-50 shadow-lg scale-105"
-                            : "border-gray-200 hover:border-red-300 hover:bg-red-50/50"
+                        className={`p-4 sm:p-5 rounded-xl border-2 transition-all ${
+                          answers[dynamicQuestions[currentQuestionIndex].id] === false
+                            ? "border-red-500 bg-red-50 scale-105"
+                            : "border-gray-200 hover:border-red-300"
                         }`}
                       >
-                        <div className="text-5xl mb-3">❌</div>
-                        <p className="font-bold text-lg text-gray-900">No</p>
+                        <div className="text-3xl sm:text-4xl mb-2">❌</div>
+                        <p className="font-bold text-sm sm:text-base text-gray-900">No</p>
                       </button>
                     </div>
                   ) : (
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
                       <textarea
-                        value={
-                          (answers[
-                            dynamicQuestions[currentQuestionIndex]?.id
-                          ] as string) || ""
-                        }
+                        value={(answers[dynamicQuestions[currentQuestionIndex]?.id] as string) || ""}
                         onChange={(e) =>
                           setAnswers({
                             ...answers,
-                            [dynamicQuestions[currentQuestionIndex].id]:
-                              e.target.value,
+                            [dynamicQuestions[currentQuestionIndex].id]: e.target.value,
                           })
                         }
-                        placeholder={
-                          dynamicQuestions[currentQuestionIndex]?.placeholder ||
-                          "Type your answer here..."
-                        }
-                        className="w-full min-h-[150px] px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-violet-500 focus:ring-4 focus:ring-violet-100 outline-none resize-none text-base"
+                        placeholder={dynamicQuestions[currentQuestionIndex]?.placeholder || "Type your answer..."}
+                        className="w-full min-h-[100px] px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-100 outline-none resize-none text-sm"
                         autoFocus
                       />
                       <VoiceRecorder onTranscript={handleVoiceTranscript} />
@@ -654,43 +621,37 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <div className="p-6 border-t bg-gray-50">
-                <div className="flex gap-3">
+              <div className="p-3 sm:p-4 border-t bg-gray-50 shrink-0">
+                <div className="flex gap-2">
                   {currentQuestionIndex > 0 && (
                     <Button
                       variant="outline"
-                      onClick={() =>
-                        setCurrentQuestionIndex(currentQuestionIndex - 1)
-                      }
-                      className="px-6"
+                      onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
+                      className="px-4"
+                      size="sm"
                     >
-                      Previous
+                      Back
                     </Button>
                   )}
                   <Button
                     onClick={handleNextQuestion}
                     disabled={
-                      answers[dynamicQuestions[currentQuestionIndex]?.id] ===
-                        undefined ||
-                      (dynamicQuestions[currentQuestionIndex]?.type ===
-                        "text" &&
-                        !(
-                          answers[
-                            dynamicQuestions[currentQuestionIndex]?.id
-                          ] as string
-                        )?.trim())
+                      answers[dynamicQuestions[currentQuestionIndex]?.id] === undefined ||
+                      (dynamicQuestions[currentQuestionIndex]?.type === "text" &&
+                        !(answers[dynamicQuestions[currentQuestionIndex]?.id] as string)?.trim())
                     }
-                    className="flex-1 h-12 text-base font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 shadow-lg"
+                    className="flex-1 h-10 text-sm sm:text-base font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                    size="sm"
                   >
                     {currentQuestionIndex === dynamicQuestions.length - 1 ? (
                       <>
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Generate Document
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Generate
                       </>
                     ) : (
                       <>
-                        Next Question
-                        <ArrowRight className="w-5 h-5 ml-2" />
+                        Next
+                        <ArrowRight className="w-4 h-4 ml-2" />
                       </>
                     )}
                   </Button>

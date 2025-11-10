@@ -26,6 +26,8 @@ interface TiptapEditorProps {
   fontFamily?: string;
   textColor?: string;
   backgroundColor?: string;
+  editable?: boolean;
+  variant?: "page" | "viewer";
 }
 
 export function TiptapEditor({
@@ -37,9 +39,12 @@ export function TiptapEditor({
   fontFamily = "Arial",
   textColor = "#000000",
   backgroundColor = "#ffffff",
+  editable = true,
+  variant = "page",
 }: TiptapEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
+    editable,
     extensions: [
       StarterKit.configure({
         bulletList: {
@@ -126,6 +131,13 @@ export function TiptapEditor({
     return <div className="p-4 text-gray-400">Loading editor...</div>;
   }
 
+  if (variant === "viewer") {
+    return (
+      <div className="tiptap-editor-wrapper bg-white p-2 sm:p-4 overflow-y-auto">
+        <EditorContent editor={editor} />
+      </div>
+    );
+  }
   return (
     <div className="tiptap-editor-wrapper h-full overflow-y-auto bg-gray-100 p-1 sm:p-4">
       <div 

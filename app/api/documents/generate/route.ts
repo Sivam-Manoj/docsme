@@ -18,7 +18,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { prompt, documentType, effort = "medium", verbosity = "medium" } = await req.json();
+    const {
+      prompt,
+      documentType,
+      effort = "medium",
+      verbosity = "medium",
+    } = await req.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -71,6 +76,7 @@ export async function POST(req: NextRequest) {
       text: {
         verbosity: verbosity as "low" | "medium" | "high",
       },
+      stream: true,
     });
 
     // Create a streaming response
@@ -80,14 +86,19 @@ export async function POST(req: NextRequest) {
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of stream) {
-            const text = (chunk as any).output_text || "";
-            fullContent += text;
-            
-            // Send chunk to client
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ content: text, done: false })}\n\n`)
-            );
+          for await (const event of stream) {
+            // Listen for output_text.delta events
+            if (event.type === "response.output_text.delta") {
+              const text = (event as any).delta || "";
+              fullContent += text;
+
+              // Send chunk to client
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({ content: text, done: false })}\n\n`
+                )
+              );
+            }
           }
 
           // Save the document after streaming completes
@@ -129,7 +140,10 @@ export async function POST(req: NextRequest) {
           console.error("Streaming error:", error);
           controller.enqueue(
             encoder.encode(
-              `data: ${JSON.stringify({ error: error.message, done: true })}\n\n`
+              `data: ${JSON.stringify({
+                error: error.message,
+                done: true,
+              })}\n\n`
             )
           );
           controller.close();

@@ -224,7 +224,7 @@ export default function DashboardPage() {
       <Navbar />
 
       <main className={`relative z-10 mx-auto transition-all duration-300 ${
-        isCreating ? "fixed inset-0 top-16 p-0 max-w-none w-full h-[calc(100vh-4rem)] overflow-hidden" : "max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-12"
+        isCreating ? "fixed inset-0 top-16 p-0 max-w-none w-full h-[calc(100vh-4rem)] overflow-hidden" : "max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-18 pb-6"
       }`}>
         {/* Header - Hide when creating */}
         {!isCreating && (
@@ -232,16 +232,16 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-8 sm:mb-12"
+            className="mb-4 sm:mb-6"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2 sm:mb-3 leading-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-1 leading-tight">
                   Welcome back, {session?.user?.name?.split(' ')[0]}! 👋
                 </h1>
-                <p className="text-gray-600 text-base sm:text-lg flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-violet-500" />
-                  Create and manage your AI-powered documents
+                <p className="text-gray-600 text-xs sm:text-sm flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-500" />
+                  Create and manage documents
                 </p>
               </div>
               {documents.length > 0 && (
@@ -249,11 +249,11 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-violet-200 shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/80 backdrop-blur-sm rounded-full border border-violet-200 shadow-sm"
                 >
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-semibold text-gray-700">
-                    {documents.length} {documents.length === 1 ? 'Document' : 'Documents'}
+                  <TrendingUp className="w-3.5 h-3.5 text-green-500" />
+                  <span className="text-xs font-semibold text-gray-700">
+                    {documents.length} {documents.length === 1 ? 'Doc' : 'Docs'}
                   </span>
                 </motion.div>
               )}
@@ -289,16 +289,16 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="mb-8"
+            className="mb-4"
           >
-            <div className="border-2 border-dashed border-violet-300 hover:border-violet-500 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-6">
+            <div className="border-2 border-dashed border-violet-300 hover:border-violet-500 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg p-3">
               <Button
                 onClick={() => router.push("/generate")}
-                size="lg"
-                className="w-full h-16 text-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                size="sm"
+                className="w-full h-11 text-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
               >
-                <Sparkles className="w-6 h-6 mr-2" />
-                Create New Document with AI
+                <Sparkles className="w-4 h-4 mr-2" />
+                Create New Document
               </Button>
             </div>
           </motion.div>
@@ -312,13 +312,13 @@ export default function DashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="mt-8 sm:mt-12"
+              className="mt-4 sm:mt-6"
             >
-              <div className="flex items-center justify-between mb-6 sm:mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                   Your Documents
                   {documents.length > 0 && (
-                    <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-violet-100 text-violet-700 rounded-full">
+                    <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-violet-100 text-violet-700 rounded-full">
                       {documents.length}
                     </span>
                   )}
@@ -338,7 +338,7 @@ export default function DashboardPage() {
                       },
                     },
                   }}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
                 >
                   {documents.map((doc, index) => (
                     <DocumentCard
