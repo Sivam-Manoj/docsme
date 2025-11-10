@@ -101,12 +101,10 @@ export function EditorToolbar({
         </Button>
 
         {/* Download - Desktop Only */}
-        <div 
-          className="relative hidden lg:block"
-          onMouseEnter={() => setShowDownloadMenu(true)}
-          onMouseLeave={() => setShowDownloadMenu(false)}
-        >
+        <div className="relative hidden lg:block">
           <Button
+            onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+            onMouseEnter={() => setShowDownloadMenu(true)}
             variant="outline"
             size="sm"
             className="h-9"
@@ -116,9 +114,15 @@ export function EditorToolbar({
           </Button>
           
           {showDownloadMenu && (
-            <div 
-              className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
-            >
+            <>
+              <div 
+                className="fixed inset-0 z-40"
+                onClick={() => setShowDownloadMenu(false)}
+              />
+              <div 
+                className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
+                onMouseLeave={() => setShowDownloadMenu(false)}
+              >
               <button
                 onClick={() => {
                   onDownloadPDF();
@@ -139,7 +143,8 @@ export function EditorToolbar({
                 <Image className="w-4 h-4" />
                 Download as Image
               </button>
-            </div>
+              </div>
+            </>
           )}
         </div>
 

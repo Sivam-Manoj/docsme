@@ -11,6 +11,7 @@ import { CreateDocumentCard } from "@/components/dashboard/create-document-card"
 import { DocumentCard } from "@/components/dashboard/document-card";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { Loader2, Sparkles, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
 interface Document {
@@ -283,13 +284,24 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className={isCreating ? "h-full w-full flex items-center justify-center p-2 sm:p-4" : ""}
+          className=""
         >
-          <CreateDocumentCard
-            onGenerate={handleGenerate}
-            isGenerating={isGenerating}
-            onExpandChange={setIsCreating}
-          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-8"
+          >
+            <div className="border-2 border-dashed border-violet-300 hover:border-violet-500 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl p-6">
+              <Button
+                onClick={() => router.push("/generate")}
+                size="lg"
+                className="w-full h-16 text-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+              >
+                <Sparkles className="w-6 h-6 mr-2" />
+                Create New Document with AI
+              </Button>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Documents Section - Hide when creating */}
