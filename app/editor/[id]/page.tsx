@@ -221,29 +221,61 @@ export default function EditorPage({
 
     try {
       // Wait for any pending renders
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Get the element to convert
       const element = contentRef.current;
       
+      // Clone element and fix unsupported color functions
+      const clone = element.cloneNode(true) as HTMLElement;
+      window.document.body.appendChild(clone);
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      
+      // Replace unsupported color functions (lab, lch, oklab, etc.)
+      const allElements = clone.querySelectorAll('*');
+      allElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const computedStyle = window.getComputedStyle(htmlEl);
+        
+        // Fix color, background-color, border-color
+        ['color', 'backgroundColor', 'borderColor'].forEach(prop => {
+          const value = computedStyle[prop as any];
+          if (value && (value.includes('lab') || value.includes('lch') || value.includes('oklab'))) {
+            // Convert to RGB fallback
+            htmlEl.style[prop as any] = 'rgb(0, 0, 0)';
+          }
+        });
+      });
+      
       // Create canvas with better options
-      const canvas = await html2canvas(element, {
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: document.styling?.backgroundColor || "#ffffff",
         logging: false,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
+        ignoreElements: (element) => {
+          return element.classList?.contains('no-print') || false;
+        },
       });
+
+      // Remove clone
+      window.document.body.removeChild(clone);
 
       // Convert canvas to image
       const imgData = canvas.toDataURL("image/png", 1.0);
       
-      // Calculate dimensions for A4
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // A4 dimensions in mm
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 10; // 10mm margin
+      const contentWidth = pageWidth - (margin * 2);
+      const contentHeight = pageHeight - (margin * 2);
+      
+      // Calculate image dimensions
+      const imgWidth = contentWidth;
+      const imgHeight = (canvas.height * contentWidth) / canvas.width;
       
       // Create PDF
       const pdf = new jsPDF({
@@ -253,22 +285,47 @@ export default function EditorPage({
       });
 
       let heightLeft = imgHeight;
-      let position = 0;
+      let position = margin;
+      let pageNumber = 0;
 
-      // Add first page
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Add pages
+      while (heightLeft > 0 || pageNumber === 0) {
+        if (pageNumber > 0) {
+          pdf.addPage();
+        }
 
-      // Add more pages if content is longer
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        // Calculate the source Y position for this page
+        const sourceY = pageNumber * contentHeight * (canvas.width / contentWidth);
+        const sourceHeight = Math.min(
+          contentHeight * (canvas.width / contentWidth),
+          canvas.height - sourceY
+        );
+
+        // Only add image if there's content to show
+        if (sourceHeight > 0) {
+          // Calculate the portion of the image to show on this page
+          const yPosition = margin;
+          const heightToShow = Math.min(contentHeight, heightLeft);
+          
+          if (pageNumber === 0) {
+            // First page - show from top
+            pdf.addImage(imgData, "PNG", margin, yPosition, imgWidth, imgHeight);
+          } else {
+            // Subsequent pages - offset the image
+            const offsetY = yPosition - (pageNumber * contentHeight);
+            pdf.addImage(imgData, "PNG", margin, offsetY, imgWidth, imgHeight);
+          }
+        }
+
+        heightLeft -= contentHeight;
+        pageNumber++;
+
+        // Safety break to avoid infinite loop
+        if (pageNumber > 50) break;
       }
 
       // Save the PDF
-      const fileName = `${document.title.replace(/[^a-z0-9]/gi, '_') || "document"}.pdf`;
+      const fileName = `${document.title.replace(/[^a-z0-9\s]/gi, '_').trim() || "document"}.pdf`;
       pdf.save(fileName);
       
       toast.success("PDF downloaded successfully!", { id: toastId });

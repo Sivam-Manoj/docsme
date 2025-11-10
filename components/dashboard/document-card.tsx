@@ -148,15 +148,13 @@ export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
             </Link>
             
             {/* Download Button with Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setShowDownloadMenu(true)}
-              onMouseLeave={() => setShowDownloadMenu(false)}
-            >
+            <div className="relative">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                   variant="outline"
                   size="icon"
+                  onMouseEnter={() => setShowDownloadMenu(true)}
+                  onClick={() => setShowDownloadMenu(!showDownloadMenu)}
                   className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-600 transition-all duration-300 shadow-sm hover:shadow-md"
                   title="Download document"
                 >
@@ -165,27 +163,35 @@ export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
               </motion.div>
               
               {showDownloadMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute bottom-full right-0 mb-2 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
-                >
-                  <button
-                    onClick={() => handleDownload('pdf')}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                <>
+                  {/* Backdrop to close menu */}
+                  <div 
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowDownloadMenu(false)}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    onMouseLeave={() => setShowDownloadMenu(false)}
+                    className="absolute bottom-full right-0 mb-2 w-40 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
                   >
-                    <FileText className="w-4 h-4" />
-                    Download PDF
-                  </button>
-                  <button
-                    onClick={() => handleDownload('image')}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
-                  >
-                    <Image className="w-4 h-4" />
-                    Download Image
-                  </button>
-                </motion.div>
+                    <button
+                      onClick={() => handleDownload('pdf')}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Download PDF
+                    </button>
+                    <button
+                      onClick={() => handleDownload('image')}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                    >
+                      <Image className="w-4 h-4" />
+                      Download Image
+                    </button>
+                  </motion.div>
+                </>
               )}
             </div>
             
