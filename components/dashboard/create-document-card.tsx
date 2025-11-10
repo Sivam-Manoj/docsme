@@ -4,11 +4,11 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Plus, X, Loader2, MessageCircleQuestion, FileCode, Users, Briefcase, FileText } from "lucide-react";
+import { Sparkles, Plus, X, Loader2, MessageCircleQuestion, FileCode, Users, Briefcase, FileText, Brain, Zap } from "lucide-react";
 import { VoiceRecorder } from "./voice-recorder";
 
 interface CreateDocumentCardProps {
-  onGenerate: (prompt: string) => Promise<void>;
+  onGenerate: (prompt: string, effort?: string, verbosity?: string) => Promise<void>;
   isGenerating: boolean;
   onExpandChange?: (isExpanded: boolean) => void;
 }
@@ -32,6 +32,8 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
   const [answers, setAnswers] = useState<Record<string, string | boolean>>({});
   const [dynamicQuestions, setDynamicQuestions] = useState<Question[]>([]);
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(false);
+  const [effort, setEffort] = useState<string>("medium");
+  const [verbosity, setVerbosity] = useState<string>("medium");
 
   const handleShowPromptChange = (show: boolean) => {
     setShowPrompt(show);
@@ -109,7 +111,7 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
 
   const handleGenerate = async () => {
     const finalPrompt = questionMode && Object.keys(answers).length > 0 ? buildPromptFromAnswers() : prompt;
-    await onGenerate(finalPrompt);
+    await onGenerate(finalPrompt, effort, verbosity);
     setPrompt("");
     setShowQuestionModal(false);
     setDynamicQuestions([]);
@@ -168,10 +170,10 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full h-full flex items-center justify-center"
+            className="w-full h-full flex items-start justify-center pt-4 sm:pt-8 md:pt-12 pb-4 overflow-y-auto"
           >
-            <Card className="border-2 border-violet-500 shadow-2xl bg-white overflow-hidden flex flex-col w-full max-w-4xl rounded-2xl" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
-              <CardHeader className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 text-white shrink-0 px-4 sm:px-5 py-3 sm:py-4">
+            <Card className="border-2 border-violet-500 shadow-2xl bg-white overflow-hidden flex flex-col w-full max-w-4xl rounded-2xl mx-2 sm:mx-4" style={{ maxHeight: 'calc(100vh - 6rem)' }}>
+              <CardHeader className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 text-white shrink-0 px-3 sm:px-5 py-3 sm:py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                     <div className="p-1.5 sm:p-2 bg-white/20 rounded-lg backdrop-blur-sm shrink-0">
@@ -201,9 +203,9 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
                 </div>
               </CardHeader>
               
-              <CardContent className="p-4 sm:p-5 space-y-3 overflow-hidden flex-1 flex flex-col">
+              <CardContent className="p-3 sm:p-4 md:p-5 space-y-2.5 sm:space-y-3 overflow-y-auto flex-1 flex flex-col">
                 {/* Question Mode Toggle */}
-                <div className="flex items-center justify-between p-2 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border border-violet-200 shrink-0">
+                <div className="flex items-center justify-between p-2 sm:p-2.5 bg-gradient-to-r from-violet-50 to-purple-50 rounded-lg border border-violet-200 shrink-0">
                   <div className="flex items-center gap-2">
                     <MessageCircleQuestion className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-600" />
                     <div>
@@ -235,10 +237,10 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
 
                 {/* Document Type Selector */}
                 <div className="space-y-1.5 shrink-0">
-                  <label className="text-xs font-semibold text-gray-900">
+                  <label className="text-xs sm:text-sm font-semibold text-gray-900">
                     Document Type
                   </label>
-                  <div className="grid grid-cols-4 gap-1.5">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
                     {docTypes.map((type) => (
                       <button
                         key={type.id}
@@ -263,22 +265,72 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
                   </div>
                 </div>
 
+                {/* Effort Selection */}
+                <div className="space-y-1.5 shrink-0">
+                  <label className="text-xs sm:text-sm font-semibold text-gray-900 flex items-center gap-1">
+                    <Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-violet-600" />
+                    Thinking Effort
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+                    {[{ id: "minimal", label: "Minimal", desc: "⚡ Fastest" }, { id: "low", label: "Low", desc: "🚀 Quick" }, { id: "medium", label: "Medium", desc: "⚖️ Balanced" }, { id: "high", label: "High", desc: "🧠 Deep" }].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setEffort(opt.id)}
+                        disabled={isGenerating}
+                        className={`p-1.5 rounded-lg border-2 transition-all text-center ${
+                          effort === opt.id
+                            ? "border-blue-500 bg-blue-50 shadow-sm"
+                            : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        <p className="font-medium text-[9px] text-gray-900 leading-tight">{opt.label}</p>
+                        <p className="text-[8px] text-gray-500">{opt.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Verbosity Selection */}
+                <div className="space-y-1.5 shrink-0">
+                  <label className="text-xs sm:text-sm font-semibold text-gray-900 flex items-center gap-1">
+                    <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-violet-600" />
+                    Content Detail
+                  </label>
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                    {[{ id: "low", label: "Concise", desc: "📝 Brief" }, { id: "medium", label: "Balanced", desc: "📄 Standard" }, { id: "high", label: "Detailed", desc: "📚 Comprehensive" }].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setVerbosity(opt.id)}
+                        disabled={isGenerating}
+                        className={`p-1.5 rounded-lg border-2 transition-all text-center ${
+                          verbosity === opt.id
+                            ? "border-green-500 bg-green-50 shadow-sm"
+                            : "border-gray-200 hover:border-green-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        <p className="font-medium text-[9px] text-gray-900 leading-tight">{opt.label}</p>
+                        <p className="text-[8px] text-gray-500">{opt.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Direct Prompt Input */}
                 <div className="space-y-2 flex-1 flex flex-col min-h-0">
                     <div className="space-y-1.5 flex-1 flex flex-col min-h-0">
-                      <label className="text-xs font-semibold text-gray-900 shrink-0">
+                      <label className="text-xs sm:text-sm font-semibold text-gray-900 shrink-0">
                         Describe Your Document
                       </label>
-                      <div className="flex gap-2 flex-1 min-h-0">
+                      <div className="flex flex-col sm:flex-row gap-2 flex-1 min-h-0">
                         <textarea
                           placeholder="e.g., Create a technical specification for a React Native mobile app..."
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value)}
-                          className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none resize-none text-sm"
+                          className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 outline-none resize-none text-sm min-h-[100px] sm:min-h-0"
                           disabled={isGenerating}
                           rows={3}
                         />
-                        <div className="shrink-0">
+                        <div className="shrink-0 self-start sm:self-auto">
                           <VoiceRecorder onTranscript={handleVoiceTranscript} />
                         </div>
                       </div>
@@ -287,7 +339,7 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
                     <Button
                       onClick={questionMode ? handleGenerateQuestions : handleGenerate}
                       disabled={isGenerating || isGeneratingQuestions || !prompt.trim()}
-                      className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 shrink-0"
+                      className="w-full h-10 sm:h-11 text-sm sm:text-base font-semibold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 shrink-0"
                     >
                       {isGeneratingQuestions ? (
                         <>
@@ -312,19 +364,30 @@ export function CreateDocumentCard({ onGenerate, isGenerating, onExpandChange }:
                       )}
                     </Button>
 
-                    {/* Quick Suggestions */}
-                    <div className="space-y-1 shrink-0">
-                      <p className="text-[10px] font-medium text-gray-600">Quick suggestions:</p>
-                      <div className="flex flex-wrap gap-1.5">
+                    {/* Quick Suggestions - Beautiful Centered Chips */}
+                    <div className="space-y-2 shrink-0 bg-gradient-to-br from-gray-50 to-violet-50/30 rounded-xl p-3 border border-violet-100">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-200 to-transparent"></div>
+                        <p className="text-xs sm:text-sm font-semibold text-gray-700 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+                          Quick Suggestions
+                        </p>
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-violet-200 to-transparent"></div>
+                      </div>
+                      <div className="flex flex-wrap justify-center gap-2">
                         {quickSuggestions.map((suggestion, idx) => (
-                          <button
+                          <motion.button
                             key={idx}
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => setPrompt(suggestion)}
                             disabled={isGenerating}
-                            className="inline-flex items-center text-[10px] px-2 py-1 bg-gradient-to-r from-violet-50 to-purple-50 hover:from-violet-100 hover:to-purple-100 text-violet-700 rounded-full border border-violet-200 transition-all hover:shadow-sm hover:scale-105 font-medium"
+                            className="group relative inline-flex items-center text-xs sm:text-sm px-3 sm:px-4 py-2 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 hover:from-violet-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-full shadow-md hover:shadow-lg transition-all duration-300 font-medium overflow-hidden"
                           >
-                            <span className="truncate max-w-[200px]">{suggestion}</span>
-                          </button>
+                            <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1.5 relative z-10" />
+                            <span className="relative z-10 truncate max-w-[150px] sm:max-w-[200px]">{suggestion}</span>
+                          </motion.button>
                         ))}
                       </div>
                     </div>

@@ -255,8 +255,20 @@ export default function EditorPage({
         allowTaint: true,
         backgroundColor: document.styling?.backgroundColor || "#ffffff",
         logging: false,
+        removeContainer: true,
+        imageTimeout: 0,
         ignoreElements: (element) => {
           return element.classList?.contains('no-print') || false;
+        },
+        onclone: (clonedDoc) => {
+          // Remove any borders from the cloned document
+          const clonedContent = clonedDoc.querySelector('[data-pdf-content]');
+          if (clonedContent) {
+            const elem = clonedContent as HTMLElement;
+            elem.style.border = 'none';
+            elem.style.outline = 'none';
+            elem.style.boxShadow = 'none';
+          }
         },
       });
 
@@ -426,7 +438,7 @@ export default function EditorPage({
             )}
 
             {/* Tiptap Editor */}
-            <div ref={contentRef}>
+            <div ref={contentRef} data-pdf-content>
               <TiptapEditor
                 content={document.content}
                 onChange={(html) => setDocument({ ...document, content: html })}

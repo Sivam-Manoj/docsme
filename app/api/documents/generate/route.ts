@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { prompt, documentType } = await req.json();
+    const { prompt, documentType, effort = "medium", verbosity = "medium" } = await req.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -55,53 +55,95 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate document content with OpenAI
+    // Generate document content with OpenAI (Streaming)
     const systemPrompt = `You are a professional document writer. Generate a well-structured, professional document based on the user's prompt. 
-    Format the document with proper headings, paragraphs, and sections. 
+    Format the document with proper HTML formatting for structure.
     Make it comprehensive and ready to use for ${
       documentType || "general purpose"
     }.
-    Use markdown-like formatting for structure but output plain text with line breaks.`;
+    Use proper HTML tags like <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em> for formatting.`;
 
-    const completion = await openai.responses.create({
+    const stream = await openai.responses.stream({
       model: "gpt-5",
       input: prompt,
       instructions: systemPrompt,
-      reasoning: { effort: "minimal" },
+      reasoning: { effort: effort as "minimal" | "low" | "medium" | "high" },
       text: {
-        verbosity: "high",
+        verbosity: verbosity as "low" | "medium" | "high",
       },
     });
 
-    const generatedContent = completion?.output_text || "";
+    // Create a streaming response
+    const encoder = new TextEncoder();
+    let fullContent = "";
 
-    // Generate unique shareable link
-    const shareableLink = crypto.randomBytes(16).toString("hex");
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const text = (chunk as any).output_text || "";
+            fullContent += text;
+            
+            // Send chunk to client
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ content: text, done: false })}\n\n`)
+            );
+          }
 
-    // Create document
-    const document = await DocumentModel.create({
-      title: prompt.slice(0, 50) + (prompt.length > 50 ? "..." : ""),
-      content: generatedContent,
-      userId: user._id,
-      shareableLink,
+          // Save the document after streaming completes
+
+          // Generate unique shareable link
+          const shareableLink = crypto.randomBytes(16).toString("hex");
+
+          // Create document
+          const newDocument = await DocumentModel.create({
+            title: prompt.slice(0, 50) + (prompt.length > 50 ? "..." : ""),
+            content: fullContent,
+            userId: user._id,
+            shareableLink,
+          });
+
+          // Update user's document count
+          user.documentsCreated += 1;
+          await user.save();
+
+          // Send final message with document ID
+          const documentData = {
+            id: (newDocument as any)._id.toString(),
+            title: newDocument.title,
+            shareableLink: newDocument.shareableLink,
+          };
+
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({
+                content: "",
+                done: true,
+                document: documentData,
+              })}\n\n`
+            )
+          );
+
+          controller.close();
+        } catch (error: any) {
+          console.error("Streaming error:", error);
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({ error: error.message, done: true })}\n\n`
+            )
+          );
+          controller.close();
+        }
+      },
     });
 
-    // Update user's document count
-    user.documentsCreated += 1;
-    await user.save();
-
-    return NextResponse.json(
-      {
-        message: "Document generated successfully!",
-        document: {
-          id: document._id,
-          title: document.title,
-          content: document.content,
-          shareableLink: document.shareableLink,
-        },
+    return new Response(readableStream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
       },
-      { status: 201 }
-    );
+    });
   } catch (error: any) {
     console.error("Document generation error:", error);
     return NextResponse.json(

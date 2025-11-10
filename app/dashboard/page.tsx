@@ -73,25 +73,75 @@ export default function DashboardPage() {
     }
   };
 
-  const handleGenerate = async (prompt: string) => {
+  const handleGenerate = async (prompt: string, effort?: string, verbosity?: string) => {
     if (!prompt.trim()) {
       toast.error("Please enter a prompt");
       return;
     }
 
     setIsGenerating(true);
+    const toastId = toast.loading("Generating document...");
 
     try {
-      const response = await axios.post("/api/documents/generate", {
-        prompt,
-        documentType: "general",
+      const response = await fetch("/api/documents/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt,
+          documentType: "general",
+          effort: effort || "medium",
+          verbosity: verbosity || "medium",
+        }),
       });
 
-      toast.success("Document generated!");
+      if (!response.ok) {
+        throw new Error("Failed to generate document");
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = "";
+      let documentId = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = JSON.parse(line.slice(6));
+
+              if (data.content) {
+                fullContent += data.content;
+                toast.loading(`Generating... ${fullContent.length} characters`, { id: toastId });
+              }
+
+              if (data.done) {
+                if (data.document?.id) {
+                  documentId = data.document.id;
+                }
+                if (data.error) {
+                  throw new Error(data.error);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      toast.success("Document generated successfully!", { id: toastId });
       await fetchDocuments();
-      router.push(`/editor/${response.data.document.id}`);
+      
+      if (documentId) {
+        router.push(`/editor/${documentId}`);
+      }
     } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to generate document");
+      console.error("Generation error:", error);
+      toast.error(error.message || "Failed to generate document", { id: toastId });
     } finally {
       setIsGenerating(false);
     }
