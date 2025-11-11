@@ -30,7 +30,7 @@ export async function sendVerificationEmail(
           <body>
             <div class="container">
               <div class="header">
-                <h1>Welcome to Docume AI! 🚀</h1>
+                <h1>Welcome to docsme AI! 🚀</h1>
               </div>
               <div class="content">
                 <p>Hi ${name},</p>
@@ -44,7 +44,7 @@ export async function sendVerificationEmail(
                 <p>This link will expire in 24 hours.</p>
               </div>
               <div class="footer">
-                <p>© 2024 Docume AI. All rights reserved.</p>
+                <p>© 2024 docsme AI. All rights reserved.</p>
               </div>
             </div>
           </body>
@@ -63,7 +63,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
     await resend.emails.send({
       from: process.env.EMAIL_FROM as string,
       to: email,
-      subject: "Welcome to Docume AI! 🎉",
+      subject: "Welcome to docsme AI! 🎉",
       html: `
         <!DOCTYPE html>
         <html>
@@ -84,7 +84,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
               </div>
               <div class="content">
                 <p>Hi ${name},</p>
-                <p>Your email has been verified successfully! You can now access all features of Docume AI.</p>
+                <p>Your email has been verified successfully! You can now access all features of docsme AI.</p>
                 <h3>What you can do:</h3>
                 <div class="feature">
                   <strong>✨ Generate Documents</strong><br/>
@@ -105,7 +105,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
                 <p style="margin-top: 30px;">Ready to create your first document?</p>
               </div>
               <div class="footer">
-                <p>© 2024 Docume AI. All rights reserved.</p>
+                <p>© 2024 docsme AI. All rights reserved.</p>
               </div>
             </div>
           </body>

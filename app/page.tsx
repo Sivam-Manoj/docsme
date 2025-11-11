@@ -43,13 +43,13 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <FileText className="w-6 h-6" />
-              <span className="font-bold text-xl">Docume AI</span>
+              <span className="font-bold text-xl">docsme AI</span>
             </div>
             <p className="text-gray-400 mb-4">
               AI-powered document generation made simple
             </p>
             <p className="text-gray-500 text-sm">
-              &copy; 2024 Docume AI. All rights reserved.
+              &copy; 2024 docsme AI. All rights reserved.
             </p>
           </div>
         </footer>

@@ -57,14 +57,14 @@ export async function POST(req: NextRequest) {
     }
 
     const shareUrl = `${process.env.NEXTAUTH_URL}/shared/${shareableLink}`;
-    const senderName = session.user.name || "Docume AI User";
+    const senderName = session.user.name || "docsme AI User";
     const senderEmail = session.user.email || "noreply@documeai.com";
 
     // Send email via Resend
     const emailData = await resend.emails.send({
-      from: "Docume AI <noreply@documeai.com>",
+      from: "docsme AI <noreply@docsmeai.com>",
       to: email,
-      replyTo: "noreply@documeai.com", // Prevent replies
+      replyTo: "noreply@docsmeai.com", // Prevent replies
       subject: `${senderName} shared "${document.title}" with you`,
       html: `
         <!DOCTYPE html>
@@ -148,8 +148,8 @@ export async function POST(req: NextRequest) {
               </p>
             </div>
             <div class="footer">
-              <p>This email was sent from Docume AI. Please do not reply to this email.</p>
-              <p>© ${new Date().getFullYear()} Docume AI. All rights reserved.</p>
+              <p>This email was sent from docsme AI. Please do not reply to this email.</p>
+              <p>© ${new Date().getFullYear()} docsme AI. All rights reserved.</p>
             </div>
           </body>
         </html>
