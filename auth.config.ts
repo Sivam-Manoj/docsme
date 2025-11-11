@@ -71,6 +71,11 @@ export default {
             provider: "google",
             isVerified: true,
             emailVerified: new Date(),
+            documentsCreated: 0,
+            subscription: {
+              plan: "free",
+              status: "active",
+            },
           });
         }
       }

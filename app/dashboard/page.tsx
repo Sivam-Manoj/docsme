@@ -56,19 +56,30 @@ export default function DashboardPage() {
   const fetchDocuments = async () => {
     try {
       const response = await axios.get("/api/documents/list");
-      setDocuments(response.data.documents);
+      const docs = response.data.documents || [];
+      setDocuments(docs);
       
       // Calculate stats
-      const totalViews = response.data.documents.reduce(
+      const totalViews = docs.reduce(
         (sum: number, doc: Document) => sum + doc.views,
         0
       );
       setUserStats({
         plan: "free", // This should come from user data
-        documentsCount: response.data.documents.length,
+        documentsCount: docs.length,
       });
-    } catch (error) {
-      toast.error("Failed to fetch documents");
+    } catch (error: any) {
+      // Only show error if it's not a 404 or empty result
+      if (error.response?.status !== 404) {
+        console.error("Error fetching documents:", error);
+        toast.error("Failed to load documents. Please refresh the page.");
+      }
+      // For new users or empty results, just set empty array
+      setDocuments([]);
+      setUserStats({
+        plan: "free",
+        documentsCount: 0,
+      });
     } finally {
       setIsLoading(false);
     }

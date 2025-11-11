@@ -563,12 +563,12 @@ export default function GeneratePage() {
             key="streaming-view"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-5xl h-[90vh] sm:max-h-[95vh] overflow-hidden flex flex-col"
+            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-5xl h-[85vh] sm:h-[90vh] md:h-[85vh] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-3 sm:px-6 py-2 sm:py-3 shrink-0">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 shrink-0">
+              <div className="flex items-center justify-between gap-1 sm:gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{
@@ -578,32 +578,32 @@ export default function GeneratePage() {
                     }}
                     className="shrink-0"
                   >
-                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                   </motion.div>
                   <div className="min-w-0">
-                    <h2 className="text-sm sm:text-lg font-bold text-white truncate">
+                    <h2 className="text-xs sm:text-sm md:text-lg font-bold text-white truncate leading-tight">
                       {generatedDocId
                         ? "✨ Complete!"
                         : isReasoning
                         ? "🧠 Thinking..."
                         : "✍️ Writing..."}
                     </h2>
-                    <p className="text-xs text-white/90">
+                    <p className="text-[10px] sm:text-xs text-white/90">
                       {characterCount} chars
                     </p>
                   </div>
                 </div>
 
                 {/* Controls */}
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
                   {generatedDocId ? (
-                    <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
+                    <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-400" />
                   ) : (
                     <>
                       {/* Auto-scroll toggle button */}
                       <button
                         onClick={() => setAutoScroll(!autoScroll)}
-                        className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-xs sm:text-sm font-medium ${
+                        className={`flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg transition-all text-[10px] sm:text-xs md:text-sm font-medium ${
                           autoScroll
                             ? "bg-white text-violet-600"
                             : "bg-white/20 text-white"
@@ -614,8 +614,8 @@ export default function GeneratePage() {
                             : "Auto-scroll is Off"
                         }
                       >
-                        <ScrollText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        <span className="hidden xs:inline">
+                        <ScrollText className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">
                           {autoScroll ? "On" : "Off"}
                         </span>
                       </button>
@@ -623,11 +623,11 @@ export default function GeneratePage() {
                       {/* Stop button */}
                       <button
                         onClick={handleStopGeneration}
-                        className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-red-500/90 hover:bg-red-600 text-white rounded-lg transition-all text-xs sm:text-sm font-medium"
+                        className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-red-500/90 hover:bg-red-600 text-white rounded-md sm:rounded-lg transition-all text-[10px] sm:text-xs md:text-sm font-medium"
                         title="Stop Generation"
                       >
-                        <StopCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        <span className="hidden xs:inline">Stop</span>
+                        <StopCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline">Stop</span>
                       </button>
                     </>
                   )}
@@ -638,38 +638,38 @@ export default function GeneratePage() {
             {/* Content Preview */}
             <div
               ref={streamingViewRef}
-              className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50"
+              className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-4 lg:p-6 bg-gray-50"
             >
               {isReasoning && reasoningSummary ? (
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Brain className="w-5 h-5 text-blue-600" />
-                    <h3 className="font-bold text-blue-900">AI Reasoning</h3>
+                <div className="bg-blue-50 border border-blue-200 sm:border-2 rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 md:mb-4">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                    <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                    <h3 className="text-sm sm:text-base font-bold text-blue-900">AI Reasoning</h3>
                   </div>
-                  <div className="prose prose-sm prose-blue max-w-none text-sm text-blue-900">
+                  <div className="prose prose-sm prose-blue max-w-none text-xs sm:text-sm text-blue-900">
                     <ReactMarkdown
                       components={{
                         h1: ({ ...props }) => (
                           <h1
-                            className="text-lg font-bold text-blue-900 mb-2"
+                            className="text-sm sm:text-base md:text-lg font-bold text-blue-900 mb-1 sm:mb-2"
                             {...props}
                           />
                         ),
                         h2: ({ ...props }) => (
                           <h2
-                            className="text-base font-bold text-blue-900 mb-2"
+                            className="text-xs sm:text-sm md:text-base font-bold text-blue-900 mb-1 sm:mb-2"
                             {...props}
                           />
                         ),
                         h3: ({ ...props }) => (
                           <h3
-                            className="text-sm font-bold text-blue-800 mb-1"
+                            className="text-xs sm:text-sm font-bold text-blue-800 mb-0.5 sm:mb-1"
                             {...props}
                           />
                         ),
                         p: ({ ...props }) => (
                           <p
-                            className="text-sm text-blue-800 mb-2"
+                            className="text-xs sm:text-sm text-blue-800 mb-1 sm:mb-2"
                             {...props}
                           />
                         ),
@@ -681,13 +681,13 @@ export default function GeneratePage() {
                         ),
                         ul: ({ ...props }) => (
                           <ul
-                            className="list-disc list-inside text-sm text-blue-800 mb-2"
+                            className="list-disc list-inside text-xs sm:text-sm text-blue-800 mb-1 sm:mb-2 ml-2"
                             {...props}
                           />
                         ),
                         ol: ({ ...props }) => (
                           <ol
-                            className="list-decimal list-inside text-sm text-blue-800 mb-2"
+                            className="list-decimal list-inside text-xs sm:text-sm text-blue-800 mb-1 sm:mb-2 ml-2"
                             {...props}
                           />
                         ),
@@ -700,10 +700,10 @@ export default function GeneratePage() {
               ) : null}
 
               {streamingContent && !generatedDocId && (
-                <div className="bg-white rounded-xl shadow-sm border p-4">
-                  <div className="flex items-center gap-2 mb-3 pb-2 border-b">
-                    <FileText className="w-4 h-4 text-violet-600" />
-                    <span className="text-sm font-semibold text-gray-700">
+                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border p-2 sm:p-3 md:p-4">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 pb-1.5 sm:pb-2 border-b">
+                    <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-violet-600" />
+                    <span className="text-xs sm:text-sm font-semibold text-gray-700">
                       Document Preview
                     </span>
                   </div>
@@ -711,7 +711,7 @@ export default function GeneratePage() {
                     content={streamingContent}
                     onChange={() => {}}
                     editable={false}
-                    fontSize={14}
+                    fontSize={12}
                     fontFamily="Inter, system-ui, Arial"
                     textColor="#111827"
                   />
@@ -719,12 +719,12 @@ export default function GeneratePage() {
               )}
 
               {generatedDocId && (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 text-center">
-                  <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-3" />
-                  <p className="text-lg font-bold text-green-900 mb-1">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 sm:border-2 rounded-lg sm:rounded-xl p-4 sm:p-5 md:p-6 text-center">
+                  <CheckCircle2 className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 text-green-500 mx-auto mb-2 sm:mb-3" />
+                  <p className="text-base sm:text-lg font-bold text-green-900 mb-1">
                     Document Ready!
                   </p>
-                  <p className="text-sm text-green-700">
+                  <p className="text-xs sm:text-sm text-green-700">
                     Redirecting to editor...
                   </p>
                 </div>
