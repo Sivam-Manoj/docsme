@@ -13,7 +13,8 @@ export const metadata: Metadata = {
     default: "docsme AI - AI-Powered Document Generation",
     template: "%s | docsme AI",
   },
-  description: "Create professional documents instantly with AI assistance. Generate, edit, share, and collaborate seamlessly with advanced AI-powered document creation.",
+  description:
+    "Create professional documents instantly with AI assistance. Generate, edit, share, and collaborate seamlessly with advanced AI-powered document creation.",
   keywords: [
     "AI document generation",
     "document creation",
@@ -30,13 +31,16 @@ export const metadata: Metadata = {
   creator: "docsme AI",
   publisher: "docsme AI",
   applicationName: "docsme AI",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://www.docsme.app"
+  ),
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
     title: "docsme AI - AI-Powered Document Generation",
-    description: "Create professional documents instantly with AI assistance. Generate, edit, share, and collaborate seamlessly.",
+    description:
+      "Create professional documents instantly with AI assistance. Generate, edit, share, and collaborate seamlessly.",
     siteName: "docsme AI",
     images: [
       {
@@ -50,7 +54,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "docsme AI - AI-Powered Document Generation",
-    description: "Create professional documents instantly with AI assistance. Generate, edit, share, and collaborate seamlessly.",
+    description:
+      "Create professional documents instantly with AI assistance. Generate, edit, share, and collaborate seamlessly.",
     images: ["/cardImage.png"],
     creator: "@docsmeAI",
   },
