@@ -28,6 +28,8 @@ import {
   Subscript as SubscriptIcon,
   Superscript as SuperscriptIcon,
   Code2,
+  MoreHorizontal,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -57,6 +59,7 @@ export function TiptapToolbar({
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [showMoreTools, setShowMoreTools] = useState(false);
 
   if (!editor) {
     return null;
@@ -452,9 +455,256 @@ export function TiptapToolbar({
               type="color"
               value={backgroundColor}
               onChange={(e) => onBackgroundColorChange(e.target.value)}
-              className="w-8 h-8 border rounded cursor-pointer"
+              className="w-8 h-8 border rounded cursor-pointer hidden sm:block"
               title="Background color"
             />
+          </div>
+
+          {/* More Tools Button - Mobile Only */}
+          <div className="md:hidden relative ml-auto">
+            <Button
+              size="sm"
+              variant={showMoreTools ? "default" : "outline"}
+              onClick={() => setShowMoreTools(!showMoreTools)}
+              className="h-8 px-2"
+              title="More Tools"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+
+            {/* More Tools Modal */}
+            {showMoreTools && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40 bg-black/20" 
+                  onClick={() => setShowMoreTools(false)}
+                />
+                <div className="fixed inset-x-4 top-20 z-50 bg-white rounded-2xl shadow-2xl border-2 border-violet-200 max-h-[70vh] overflow-y-auto">
+                  {/* Header */}
+                  <div className="sticky top-0 bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-3 flex items-center justify-between rounded-t-2xl">
+                    <h3 className="font-bold text-sm">More Formatting Tools</h3>
+                    <button
+                      onClick={() => setShowMoreTools(false)}
+                      className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/20 transition"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Tools Grid */}
+                  <div className="p-4 space-y-4">
+                    {/* Text Formatting */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">TEXT FORMATTING</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("strike") ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleStrike().run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Strikethrough className="w-5 h-5" />
+                          <span className="text-[10px]">Strike</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("code") ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleCode().run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Code className="w-5 h-5" />
+                          <span className="text-[10px]">Code</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("subscript") ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleSubscript().run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <SubscriptIcon className="w-5 h-5" />
+                          <span className="text-[10px]">Subscript</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("superscript") ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleSuperscript().run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <SuperscriptIcon className="w-5 h-5" />
+                          <span className="text-[10px]">Superscript</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Block Elements */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">BLOCKS</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("heading", { level: 3 }) ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleHeading({ level: 3 }).run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Heading3 className="w-5 h-5" />
+                          <span className="text-[10px]">Heading 3</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("blockquote") ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleBlockquote().run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Quote className="w-5 h-5" />
+                          <span className="text-[10px]">Quote</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("codeBlock") ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleCodeBlock().run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Code2 className="w-5 h-5" />
+                          <span className="text-[10px]">Code Block</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Alignment */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">ALIGNMENT</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          size="sm"
+                          variant={editor.isActive({ textAlign: "right" }) ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().setTextAlign("right").run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <AlignRight className="w-5 h-5" />
+                          <span className="text-[10px]">Right</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive({ textAlign: "justify" }) ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().setTextAlign("justify").run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <AlignJustify className="w-5 h-5" />
+                          <span className="text-[10px]">Justify</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            addTable();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <TableIcon className="w-5 h-5" />
+                          <span className="text-[10px]">Table</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Link */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">INSERT</p>
+                      <div className="space-y-2">
+                        <input
+                          type="url"
+                          value={linkUrl}
+                          onChange={(e) => setLinkUrl(e.target.value)}
+                          placeholder="https://example.com"
+                          className="w-full px-3 py-2 text-sm border rounded-lg"
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              addLink();
+                              setShowMoreTools(false);
+                            }}
+                            className="w-full"
+                          >
+                            <LinkIcon className="w-4 h-4 mr-2" />
+                            Add Link
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              removeLink();
+                              setShowMoreTools(false);
+                            }}
+                            className="w-full"
+                          >
+                            Remove Link
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Font Family */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">FONT FAMILY</p>
+                      <select
+                        value={fontFamily}
+                        onChange={(e) => {
+                          onFontFamilyChange(e.target.value);
+                          setShowMoreTools(false);
+                        }}
+                        className="w-full px-3 py-2 text-sm border rounded-lg bg-white"
+                      >
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Courier New">Courier New</option>
+                      </select>
+                    </div>
+
+                    {/* Background Color */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">BACKGROUND COLOR</p>
+                      <input
+                        type="color"
+                        value={backgroundColor}
+                        onChange={(e) => onBackgroundColorChange(e.target.value)}
+                        className="w-full h-12 border-2 rounded-lg cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -231,6 +231,7 @@ export default function EditorPage({
       window.document.body.appendChild(clone);
       clone.style.position = 'absolute';
       clone.style.left = '-9999px';
+      clone.style.width = `${element.offsetWidth}px`;
       
       // Replace unsupported color functions (lab, lch, oklab, etc.)
       const allElements = clone.querySelectorAll('*');
@@ -248,14 +249,17 @@ export default function EditorPage({
         });
       });
       
-      // Create canvas with better options
+      // Detect if mobile for optimized settings
+      const isMobile = window.innerWidth < 768;
+      
+      // Create canvas with mobile-optimized options
       const canvas = await html2canvas(clone, {
-        scale: 2,
+        scale: isMobile ? 1.5 : 2, // Lower scale on mobile to avoid memory issues
         useCORS: true,
         allowTaint: true,
         backgroundColor: document.styling?.backgroundColor || "#ffffff",
         logging: false,
-        removeContainer: true,
+        removeContainer: false, // Keep container for cleanup
         imageTimeout: 0,
         ignoreElements: (element) => {
           return element.classList?.contains('no-print') || false;
@@ -273,10 +277,12 @@ export default function EditorPage({
       });
 
       // Remove clone
-      window.document.body.removeChild(clone);
+      if (clone.parentNode) {
+        clone.parentNode.removeChild(clone);
+      }
 
-      // Convert canvas to image
-      const imgData = canvas.toDataURL("image/png", 1.0);
+      // Convert canvas to image with quality based on device
+      const imgData = canvas.toDataURL("image/png", isMobile ? 0.9 : 1.0);
       
       // A4 dimensions in mm
       const pageWidth = 210;
@@ -340,10 +346,19 @@ export default function EditorPage({
       const fileName = `${document.title.replace(/[^a-z0-9\s]/gi, '_').trim() || "document"}.pdf`;
       pdf.save(fileName);
       
-      toast.success("PDF downloaded successfully!", { id: toastId });
+      toast.success("PDF downloaded!", { id: toastId });
     } catch (error: any) {
       console.error("PDF download error:", error);
-      toast.error(error.message || "Failed to download PDF. Please try again.", { id: toastId });
+      
+      // Provide more helpful error messages
+      let errorMessage = "Failed to download PDF";
+      if (error.message?.includes("memory") || error.message?.includes("canvas")) {
+        errorMessage = "Document too large. Try reducing content or images.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage, { id: toastId, duration: 4000 });
     }
   };
 
