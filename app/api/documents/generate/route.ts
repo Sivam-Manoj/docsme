@@ -68,16 +68,50 @@ export async function POST(req: NextRequest) {
     }.
     Use proper HTML tags like <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em> for formatting.`;
 
-    const stream = await openai.responses.stream({
-      model: "gpt-5",
-      input: prompt,
-      instructions: systemPrompt,
-      reasoning: { effort: effort as "minimal" | "low" | "medium" | "high" },
-      text: {
-        verbosity: verbosity as "low" | "medium" | "high",
-      },
-      stream: true,
-    });
+    const isDev = process.env.NODE_ENV === "development";
+
+    if (isDev) {
+      console.log("🚀 Starting document generation...");
+      console.log("📝 Config:", {
+        model: "gpt-5",
+        effort,
+        verbosity,
+        documentType,
+        promptLength: prompt.length,
+      });
+    }
+
+    let stream;
+    try {
+      stream = await openai.responses.stream({
+        model: "gpt-5",
+        input: prompt,
+        instructions: systemPrompt,
+        reasoning: {
+          effort: effort as "minimal" | "low" | "medium" | "high",
+          summary: "auto",
+        },
+        text: {
+          verbosity: verbosity as "low" | "medium" | "high",
+        },
+        stream: true,
+      });
+
+      if (isDev) {
+        console.log("✅ Stream initialized successfully");
+      }
+    } catch (streamError: any) {
+      if (isDev) {
+        console.error("❌ Failed to initialize stream:", {
+          message: streamError.message,
+          status: streamError.status,
+          code: streamError.code,
+          type: streamError.type,
+          error: streamError.error,
+        });
+      }
+      throw streamError;
+    }
 
     // Create a streaming response
     const encoder = new TextEncoder();
@@ -86,11 +120,107 @@ export async function POST(req: NextRequest) {
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
+          let eventCount = 0;
+          let reasoningCount = 0;
+          let contentCount = 0;
+
+          if (isDev) {
+            console.log("📡 Starting stream processing...");
+          }
+
           for await (const event of stream) {
+            eventCount++;
+
+            // Log all event types in dev mode with FULL event details (first 30 events)
+            if (isDev && eventCount <= 30) {
+              console.log(`📨 Event #${eventCount}:`, {
+                type: event.type,
+                hasData: !!(event as any).delta || !!(event as any).text,
+                fullEvent: event, // Log the complete event object
+              });
+            }
+
+            // Check for reasoning output item
+            if (
+              event.type === "response.output_item.added" ||
+              event.type === "response.output_item.done"
+            ) {
+              const item = (event as any).item;
+              if (item && item.type === "reasoning") {
+                if (isDev) {
+                  console.log(`🧠 REASONING ITEM ${event.type}:`, {
+                    id: item.id,
+                    hasSummary: Array.isArray(item.summary),
+                    summaryLength: Array.isArray(item.summary)
+                      ? item.summary.length
+                      : 0,
+                    summary: item.summary,
+                  });
+                }
+
+                // If summary is populated, send it to client
+                if (Array.isArray(item.summary) && item.summary.length > 0) {
+                  const summaryText = item.summary
+                    .map((s: any) => s.text || s)
+                    .join(" ");
+
+                  if (summaryText && isDev) {
+                    console.log(`🧠 Reasoning summary found:`, {
+                      length: summaryText.length,
+                      preview: summaryText.slice(0, 100),
+                    });
+                  }
+
+                  if (summaryText) {
+                    controller.enqueue(
+                      encoder.encode(
+                        `data: ${JSON.stringify({
+                          reasoning: summaryText,
+                          done: false,
+                        })}\n\n`
+                      )
+                    );
+                  }
+                }
+              }
+            }
+
+            // Listen for reasoning summary delta events (if they exist)
+            if (event.type === "response.reasoning_summary_text.delta") {
+              reasoningCount++;
+              const reasoningText = (event as any).delta || "";
+
+              if (isDev && reasoningCount <= 5) {
+                console.log(`🧠 Reasoning delta #${reasoningCount}:`, {
+                  length: reasoningText.length,
+                  preview: reasoningText.slice(0, 50),
+                });
+              }
+
+              // Send reasoning chunk to client
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    reasoning: reasoningText,
+                    done: false,
+                  })}\n\n`
+                )
+              );
+            }
+
             // Listen for output_text.delta events
             if (event.type === "response.output_text.delta") {
+              contentCount++;
               const text = (event as any).delta || "";
               fullContent += text;
+
+              if (isDev && contentCount <= 5) {
+                console.log(`✍️ Content chunk #${contentCount}:`, {
+                  length: text.length,
+                  totalLength: fullContent.length,
+                  preview: text.slice(0, 50),
+                });
+              }
 
               // Send chunk to client
               controller.enqueue(
@@ -101,7 +231,19 @@ export async function POST(req: NextRequest) {
             }
           }
 
+          if (isDev) {
+            console.log("✅ Stream completed:", {
+              totalEvents: eventCount,
+              reasoningChunks: reasoningCount,
+              contentChunks: contentCount,
+              finalContentLength: fullContent.length,
+            });
+          }
+
           // Save the document after streaming completes
+          if (isDev) {
+            console.log("💾 Saving document to database...");
+          }
 
           // Generate unique shareable link
           const shareableLink = crypto.randomBytes(16).toString("hex");
@@ -114,9 +256,24 @@ export async function POST(req: NextRequest) {
             shareableLink,
           });
 
+          if (isDev) {
+            console.log("✅ Document saved:", {
+              id: (newDocument as any)._id.toString(),
+              title: newDocument.title,
+              contentLength: fullContent.length,
+            });
+          }
+
           // Update user's document count
           user.documentsCreated += 1;
           await user.save();
+
+          if (isDev) {
+            console.log(
+              "✅ User document count updated:",
+              user.documentsCreated
+            );
+          }
 
           // Send final message with document ID
           const documentData = {
@@ -135,13 +292,34 @@ export async function POST(req: NextRequest) {
             )
           );
 
+          if (isDev) {
+            console.log(
+              "🎉 Generation complete! Document ID:",
+              documentData.id
+            );
+          }
+
           controller.close();
         } catch (error: any) {
-          console.error("Streaming error:", error);
+          if (isDev) {
+            console.error("❌ Streaming error details:", {
+              message: error.message,
+              status: error.status,
+              code: error.code,
+              type: error.type,
+              headers: error.headers,
+              requestID: error.requestID,
+              error: error.error,
+              stack: error.stack,
+            });
+          } else {
+            console.error("Streaming error:", error.message);
+          }
+
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({
-                error: error.message,
+                error: error.message || "Failed to generate document",
                 done: true,
               })}\n\n`
             )
@@ -159,7 +337,23 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error("Document generation error:", error);
+    const isDev = process.env.NODE_ENV === "development";
+
+    if (isDev) {
+      console.error("❌ Document generation error (top level):", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        type: error.type,
+        headers: error.headers,
+        requestID: error.requestID,
+        error: error.error,
+        stack: error.stack,
+      });
+    } else {
+      console.error("Document generation error:", error.message);
+    }
+
     return NextResponse.json(
       { error: error.message || "Failed to generate document" },
       { status: 500 }
