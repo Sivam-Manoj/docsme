@@ -36,6 +36,15 @@ export default function GeneratePage() {
   const [characterCount, setCharacterCount] = useState(0);
   const streamingViewRef = useRef<HTMLDivElement>(null);
 
+  // Load pending prompt from try-now modal
+  useEffect(() => {
+    const pendingPrompt = sessionStorage.getItem("pendingPrompt");
+    if (pendingPrompt) {
+      setPrompt(pendingPrompt);
+      sessionStorage.removeItem("pendingPrompt");
+    }
+  }, []);
+
   const quickSuggestions = [
     "Technical specification for a mobile app",
     "API documentation for REST endpoints",

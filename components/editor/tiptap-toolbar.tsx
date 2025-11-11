@@ -23,6 +23,11 @@ import {
   Table as TableIcon,
   Type,
   Palette,
+  Highlighter,
+  Link as LinkIcon,
+  Subscript as SubscriptIcon,
+  Superscript as SuperscriptIcon,
+  Code2,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -50,6 +55,8 @@ export function TiptapToolbar({
   onBackgroundColorChange,
 }: TiptapToolbarProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
 
   if (!editor) {
     return null;
@@ -61,6 +68,18 @@ export function TiptapToolbar({
 
   const setColor = (color: string) => {
     editor.chain().focus().setColor(color).run();
+  };
+
+  const addLink = () => {
+    if (linkUrl) {
+      editor.chain().focus().setLink({ href: linkUrl }).run();
+      setLinkUrl("");
+      setShowLinkInput(false);
+    }
+  };
+
+  const removeLink = () => {
+    editor.chain().focus().unsetLink().run();
   };
 
   return (
@@ -130,6 +149,96 @@ export function TiptapToolbar({
             >
               <Strikethrough className="w-4 h-4" />
             </Button>
+            <Button
+              size="sm"
+              variant={editor.isActive("code") ? "default" : "ghost"}
+              onClick={() => editor.chain().focus().toggleCode().run()}
+              title="Inline Code"
+              className="h-8 w-8 p-0 hidden md:flex"
+            >
+              <Code className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* More Formatting */}
+          <div className="flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
+            <Button
+              size="sm"
+              variant={editor.isActive("highlight") ? "default" : "ghost"}
+              onClick={() => editor.chain().focus().toggleHighlight().run()}
+              title="Highlight"
+              className="h-8 w-8 p-0"
+            >
+              <Highlighter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant={editor.isActive("subscript") ? "default" : "ghost"}
+              onClick={() => editor.chain().focus().toggleSubscript().run()}
+              title="Subscript"
+              className="h-8 w-8 p-0 hidden md:flex"
+            >
+              <SubscriptIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant={editor.isActive("superscript") ? "default" : "ghost"}
+              onClick={() => editor.chain().focus().toggleSuperscript().run()}
+              title="Superscript"
+              className="h-8 w-8 p-0 hidden md:flex"
+            >
+              <SuperscriptIcon className="w-4 h-4" />
+            </Button>
+            <div className="relative hidden md:block">
+              <Button
+                size="sm"
+                variant={editor.isActive("link") ? "default" : "ghost"}
+                onClick={() => setShowLinkInput(!showLinkInput)}
+                title="Add Link"
+                className="h-8 w-8 p-0"
+              >
+                <LinkIcon className="w-4 h-4" />
+              </Button>
+              {showLinkInput && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowLinkInput(false)}
+                  />
+                  <div className="absolute top-10 left-0 z-50 bg-white p-3 rounded-lg shadow-xl border min-w-[250px]">
+                    <input
+                      type="url"
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      placeholder="https://example.com"
+                      className="w-full px-2 py-1 text-sm border rounded mb-2"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          addLink();
+                        }
+                      }}
+                    />
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        onClick={addLink}
+                        className="flex-1 h-7 text-xs"
+                      >
+                        Add
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={removeLink}
+                        className="flex-1 h-7 text-xs"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Headings */}
@@ -191,6 +300,15 @@ export function TiptapToolbar({
               className="h-8 w-8 p-0 hidden md:flex"
             >
               <Quote className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant={editor.isActive("codeBlock") ? "default" : "ghost"}
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              title="Code Block"
+              className="h-8 w-8 p-0 hidden lg:flex"
+            >
+              <Code2 className="w-4 h-4" />
             </Button>
           </div>
 

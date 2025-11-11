@@ -100,6 +100,19 @@ export function EditorToolbar({
           <span className="text-sm">Share</span>
         </Button>
 
+        {/* Email Share - Desktop Only */}
+        {onEmailShare && (
+          <Button 
+            onClick={onEmailShare} 
+            variant="outline" 
+            size="sm" 
+            className="hidden md:flex h-9"
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            <span className="text-sm">Email</span>
+          </Button>
+        )}
+
         {/* Download - Desktop Only */}
         <div className="relative hidden lg:block">
           <Button

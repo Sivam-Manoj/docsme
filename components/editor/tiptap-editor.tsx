@@ -13,9 +13,17 @@ import Underline from "@tiptap/extension-underline";
 import FontFamily from "@tiptap/extension-font-family";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
+import Highlight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
 import { useEffect } from "react";
 import "./tiptap-styles.css";
+
+const lowlight = createLowlight(common);
 
 interface TiptapEditorProps {
   content: string;
@@ -57,6 +65,7 @@ export function TiptapEditor({
             class: 'list-decimal pl-6',
           },
         },
+        codeBlock: false, // Disable default code block to use CodeBlockLowlight
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -75,6 +84,23 @@ export function TiptapEditor({
       TaskList,
       TaskItem.configure({
         nested: true,
+      }),
+      Highlight.configure({
+        multicolor: true,
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer',
+        },
+      }),
+      Subscript,
+      Superscript,
+      CodeBlockLowlight.configure({
+        lowlight,
+        HTMLAttributes: {
+          class: 'bg-gray-900 text-gray-100 rounded-lg p-4 font-mono text-sm overflow-x-auto',
+        },
       }),
       Markdown.configure({
         html: true,
