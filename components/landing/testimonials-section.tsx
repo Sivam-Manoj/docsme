@@ -10,7 +10,7 @@ const testimonials = [
     role: "Product Manager at TechCorp",
     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
     content:
-      "Docume AI has transformed how our team creates documentation. What used to take hours now takes minutes. The AI understands context perfectly and generates professional content every time.",
+      "docsme AI has transformed how our team creates documentation. What used to take hours now takes minutes. The AI understands context perfectly and generates professional content every time.",
     rating: 5,
   },
   {
@@ -34,7 +34,7 @@ const testimonials = [
     role: "Startup Founder",
     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
     content:
-      "Running a startup means wearing many hats. Docume AI handles all my document needs so I can focus on building my product. Couldn't imagine working without it now.",
+      "Running a startup means wearing many hats. docsme AI handles all my document needs so I can focus on building my product. Couldn't imagine working without it now.",
     rating: 5,
   },
   {
@@ -91,7 +91,8 @@ export function TestimonialsSection() {
           </h2>
 
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            See how professionals are transforming their document workflow with Docume AI
+            See how professionals are transforming their document workflow with
+            docsme AI
           </p>
         </motion.div>
 
@@ -129,19 +130,21 @@ export function TestimonialsSection() {
 
               {/* Author */}
               <div className="flex items-center gap-4 pt-6 border-t border-gray-100">
-                <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-violet-400 to-purple-400">
+                {/* <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-violet-400 to-purple-400">
                   <Image
                     src={testimonial.image}
                     alt={testimonial.name}
                     fill
                     className="object-cover"
                   />
-                </div>
+                </div> */}
                 <div>
                   <div className="font-semibold text-gray-900">
                     {testimonial.name}
                   </div>
-                  <div className="text-sm text-gray-500">{testimonial.role}</div>
+                  <div className="text-sm text-gray-500">
+                    {testimonial.role}
+                  </div>
                 </div>
               </div>
 
@@ -163,16 +166,20 @@ export function TestimonialsSection() {
             TRUSTED BY LEADING COMPANIES
           </p>
           <div className="flex flex-wrap justify-center items-center gap-12 opacity-60">
-            {["TechCorp", "InnovateCo", "DesignHub", "StartupX", "GlobalTech"].map(
-              (company) => (
-                <div
-                  key={company}
-                  className="text-2xl font-bold text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  {company}
-                </div>
-              )
-            )}
+            {[
+              "TechCorp",
+              "InnovateCo",
+              "DesignHub",
+              "StartupX",
+              "GlobalTech",
+            ].map((company) => (
+              <div
+                key={company}
+                className="text-2xl font-bold text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {company}
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

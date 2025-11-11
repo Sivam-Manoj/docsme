@@ -19,11 +19,8 @@ export function Navbar() {
             href={session ? "/dashboard" : "/"}
             className="flex items-center gap-2 font-bold text-xl"
           >
-            <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-2 rounded-lg">
-              <FileText className="w-5 h-5 text-white" />
-            </div>
             <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-              docsme AI
+              Docsme AI
             </span>
           </Link>
 

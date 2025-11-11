@@ -89,8 +89,8 @@ export default function EditorPage({
       setTimeout(() => {
         if (format === 'pdf') {
           downloadAsPDF();
-        } else if (format === 'image') {
-          downloadAsImage();
+        } else if (format === 'docx') {
+          downloadAsDocx();
         }
       }, 1000);
     }
@@ -347,28 +347,51 @@ export default function EditorPage({
     }
   };
 
-  const downloadAsImage = async () => {
-    if (!contentRef.current) return;
+  const downloadAsDocx = async () => {
+    if (!editorInstance || !document) {
+      toast.error("Document not ready");
+      return;
+    }
 
     try {
-      const canvas = await html2canvas(contentRef.current, {
-        scale: 2,
-        backgroundColor: document?.styling.backgroundColor || "#ffffff",
-      });
-
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const link = window.document.createElement("a");
-          link.href = url;
-          link.download = `${document?.title || "document"}.png`;
-          link.click();
-          URL.revokeObjectURL(url);
-          toast.success("Image downloaded!");
-        }
-      });
-    } catch (error) {
-      toast.error("Failed to download image");
+      const toastId = toast.loading("Preparing DOCX file...");
+      
+      // Get HTML content from editor
+      const htmlContent = editorInstance.getHTML();
+      
+      // Create a simple DOCX-like structure
+      // For a more robust solution, you'd use the 'docx' library
+      // For now, we'll create an HTML file that Word can open as DOCX
+      const docContent = `
+        <!DOCTYPE html>
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head>
+          <meta charset='utf-8'>
+          <title>${document.title}</title>
+          <style>
+            body { font-family: ${document.styling.fontFamily}; font-size: ${document.styling.fontSize}px; color: ${document.styling.textColor}; }
+          </style>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+        </html>
+      `;
+      
+      // Create blob and download
+      const blob = new Blob([docContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+      const url = URL.createObjectURL(blob);
+      const link = window.document.createElement('a');
+      link.href = url;
+      const fileName = `${document.title.replace(/[^a-z0-9\s]/gi, '_').trim() || "document"}.docx`;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success("DOCX downloaded successfully!", { id: toastId });
+    } catch (error: any) {
+      console.error("DOCX download error:", error);
+      toast.error(error.message || "Failed to download DOCX. Please try again.");
     }
   };
 
@@ -391,7 +414,7 @@ export default function EditorPage({
         onSave={handleSave}
         onToggleShare={() => setShowShareDialog(!showShareDialog)}
         onDownloadPDF={downloadAsPDF}
-        onDownloadImage={downloadAsImage}
+        onDownloadDocx={downloadAsDocx}
         onEmailShare={() => setShowEmailModal(true)}
       />
 

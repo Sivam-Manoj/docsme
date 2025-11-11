@@ -3,7 +3,22 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Loader2, MessageCircleQuestion, FileCode, Users, Briefcase, FileText, Brain, Zap, ArrowRight, CheckCircle2, StopCircle, ScrollText } from "lucide-react";
+import {
+  X,
+  Sparkles,
+  Loader2,
+  MessageCircleQuestion,
+  FileCode,
+  Users,
+  Briefcase,
+  FileText,
+  Brain,
+  Zap,
+  ArrowRight,
+  CheckCircle2,
+  StopCircle,
+  ScrollText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VoiceRecorder } from "@/components/dashboard/voice-recorder";
 import { TiptapEditor } from "@/components/editor/tiptap-editor";
@@ -115,7 +130,7 @@ export default function GeneratePage() {
       setAnswers({});
     } catch (error: any) {
       // Don't show error if it was aborted by user
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         console.log("Generation aborted by user");
         return;
       }
@@ -200,26 +215,27 @@ export default function GeneratePage() {
               if (data.reasoning) {
                 fullReasoning += data.reasoning;
                 setReasoningSummary(fullReasoning);
-                
+
                 // Set reasoning mode and update character count
                 if (data.reasoning.trim()) {
                   setIsReasoning(true);
                   setCharacterCount(fullReasoning.length);
                 }
-                
+
                 // Smooth auto-scroll during reasoning (only if enabled)
                 if (autoScroll) {
                   setTimeout(() => {
                     if (streamingViewRef.current) {
                       const element = streamingViewRef.current;
-                      const targetScroll = element.scrollHeight - element.clientHeight;
+                      const targetScroll =
+                        element.scrollHeight - element.clientHeight;
                       const currentScroll = element.scrollTop;
                       const distance = targetScroll - currentScroll;
-                      
+
                       // Smooth scroll to bottom
                       element.scrollTo({
                         top: targetScroll,
-                        behavior: distance > 500 ? 'auto' : 'smooth'
+                        behavior: distance > 500 ? "auto" : "smooth",
                       });
                     }
                   }, 50);
@@ -232,11 +248,11 @@ export default function GeneratePage() {
                 if (fullContent.length === 0) {
                   setIsReasoning(false);
                 }
-                
+
                 fullContent += data.content;
                 setStreamingContent(fullContent);
                 setCharacterCount(fullContent.length);
-                
+
                 // Smooth auto-scroll to follow content (only if enabled)
                 if (autoScroll) {
                   setTimeout(() => {
@@ -247,16 +263,16 @@ export default function GeneratePage() {
                       const clientHeight = element.clientHeight;
                       const currentScroll = element.scrollTop;
                       const maxScroll = scrollHeight - clientHeight;
-                      
+
                       // Target scroll position: leave ~100px margin to see content being written
                       const targetScroll = Math.max(0, maxScroll - 100);
                       const distance = Math.abs(targetScroll - currentScroll);
-                      
+
                       // Only scroll if we're not already near the target
                       if (distance > 50) {
                         element.scrollTo({
                           top: targetScroll,
-                          behavior: distance > 500 ? 'auto' : 'smooth'
+                          behavior: distance > 500 ? "auto" : "smooth",
                         });
                       }
                     }
@@ -360,13 +376,17 @@ export default function GeneratePage() {
                   <div className="flex items-center justify-between p-3 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl border border-violet-200">
                     <div className="flex items-center gap-2">
                       <MessageCircleQuestion className="w-4 h-4 text-violet-600" />
-                      <span className="text-sm font-semibold text-gray-900">AI Questions</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        AI Questions (AI ask questions based on your idea)
+                      </span>
                     </div>
                     <button
                       onClick={() => setQuestionMode(!questionMode)}
                       disabled={isGeneratingQuestions}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all ${
-                        questionMode ? "bg-gradient-to-r from-violet-600 to-purple-600" : "bg-gray-300"
+                        questionMode
+                          ? "bg-gradient-to-r from-violet-600 to-purple-600"
+                          : "bg-gray-300"
                       }`}
                     >
                       <span
@@ -379,7 +399,9 @@ export default function GeneratePage() {
 
                   {/* Document Type */}
                   <div>
-                    <label className="text-sm font-bold text-gray-900 mb-2 block">Document Type</label>
+                    <label className="text-sm font-bold text-gray-900 mb-2 block">
+                      Document Type
+                    </label>
                     <div className="grid grid-cols-4 gap-2">
                       {docTypes.map((type) => (
                         <button
@@ -394,10 +416,14 @@ export default function GeneratePage() {
                         >
                           <type.icon
                             className={`w-5 h-5 mx-auto mb-1 ${
-                              docType === type.id ? "text-violet-600" : "text-gray-500"
+                              docType === type.id
+                                ? "text-violet-600"
+                                : "text-gray-500"
                             }`}
                           />
-                          <p className="text-[10px] font-semibold text-gray-900">{type.label}</p>
+                          <p className="text-[10px] font-semibold text-gray-900">
+                            {type.label}
+                          </p>
                         </button>
                       ))}
                     </div>
@@ -466,7 +492,9 @@ export default function GeneratePage() {
                 <div className="space-y-4">
                   {/* Prompt Input */}
                   <div>
-                    <label className="text-sm font-bold text-gray-900 mb-2 block">Your Idea</label>
+                    <label className="text-sm font-bold text-gray-900 mb-2 block">
+                      Your Idea
+                    </label>
                     <div className="flex gap-2">
                       <textarea
                         placeholder="Describe what you want to create..."
@@ -481,7 +509,9 @@ export default function GeneratePage() {
 
                   {/* Quick Suggestions */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-600 mb-2 text-center">Quick Start</p>
+                    <p className="text-xs font-semibold text-gray-600 mb-2 text-center">
+                      Quick Start
+                    </p>
                     <div className="grid grid-cols-2 gap-2">
                       {quickSuggestions.map((suggestion, idx) => (
                         <button
@@ -498,7 +528,11 @@ export default function GeneratePage() {
 
                   {/* Generate Button */}
                   <Button
-                    onClick={() => questionMode ? handleGenerateQuestions() : handleGenerate(prompt)}
+                    onClick={() =>
+                      questionMode
+                        ? handleGenerateQuestions()
+                        : handleGenerate(prompt)
+                    }
                     disabled={isGeneratingQuestions || !prompt.trim()}
                     className="w-full h-12 text-base font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50"
                   >
@@ -529,55 +563,71 @@ export default function GeneratePage() {
             key="streaming-view"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col"
+            className="bg-white rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-5xl h-[90vh] sm:max-h-[95vh] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-4 sm:px-6 py-3 shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-3 sm:px-6 py-2 sm:py-3 shrink-0">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="shrink-0"
                   >
-                    <Sparkles className="w-6 h-6 text-white" />
+                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </motion.div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white">
-                      {generatedDocId ? "✨ Complete!" : isReasoning ? "🧠 Thinking..." : "✍️ Writing..."}
+                  <div className="min-w-0">
+                    <h2 className="text-sm sm:text-lg font-bold text-white truncate">
+                      {generatedDocId
+                        ? "✨ Complete!"
+                        : isReasoning
+                        ? "🧠 Thinking..."
+                        : "✍️ Writing..."}
                     </h2>
                     <p className="text-xs text-white/90">
-                      {characterCount} characters
+                      {characterCount} chars
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Controls */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   {generatedDocId ? (
-                    <CheckCircle2 className="w-8 h-8 text-green-400" />
+                    <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-green-400" />
                   ) : (
                     <>
-                      {/* Auto-scroll toggle */}
+                      {/* Auto-scroll toggle button */}
                       <button
                         onClick={() => setAutoScroll(!autoScroll)}
-                        className={`p-2 rounded-lg transition-all ${
-                          autoScroll 
-                            ? 'bg-white/20 text-white' 
-                            : 'bg-white/10 text-white/50'
-                        } hover:bg-white/30`}
-                        title={autoScroll ? "Auto-scroll On" : "Auto-scroll Off"}
+                        className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-all text-xs sm:text-sm font-medium ${
+                          autoScroll
+                            ? "bg-white text-violet-600"
+                            : "bg-white/20 text-white"
+                        } hover:bg-white hover:text-violet-600`}
+                        title={
+                          autoScroll
+                            ? "Auto-scroll is On"
+                            : "Auto-scroll is Off"
+                        }
                       >
-                        <ScrollText className="w-5 h-5" />
+                        <ScrollText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <span className="hidden xs:inline">
+                          {autoScroll ? "On" : "Off"}
+                        </span>
                       </button>
-                      
+
                       {/* Stop button */}
                       <button
                         onClick={handleStopGeneration}
-                        className="p-2 bg-red-500/90 hover:bg-red-600 text-white rounded-lg transition-all flex items-center gap-1.5 text-sm font-medium"
+                        className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-red-500/90 hover:bg-red-600 text-white rounded-lg transition-all text-xs sm:text-sm font-medium"
                         title="Stop Generation"
                       >
-                        <StopCircle className="w-5 h-5" />
-                        <span className="hidden sm:inline">Stop</span>
+                        <StopCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        <span className="hidden xs:inline">Stop</span>
                       </button>
                     </>
                   )}
@@ -586,7 +636,7 @@ export default function GeneratePage() {
             </div>
 
             {/* Content Preview */}
-            <div 
+            <div
               ref={streamingViewRef}
               className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50"
             >
@@ -599,13 +649,48 @@ export default function GeneratePage() {
                   <div className="prose prose-sm prose-blue max-w-none text-sm text-blue-900">
                     <ReactMarkdown
                       components={{
-                        h1: ({...props}) => <h1 className="text-lg font-bold text-blue-900 mb-2" {...props} />,
-                        h2: ({...props}) => <h2 className="text-base font-bold text-blue-900 mb-2" {...props} />,
-                        h3: ({...props}) => <h3 className="text-sm font-bold text-blue-800 mb-1" {...props} />,
-                        p: ({...props}) => <p className="text-sm text-blue-800 mb-2" {...props} />,
-                        strong: ({...props}) => <strong className="font-bold text-blue-900" {...props} />,
-                        ul: ({...props}) => <ul className="list-disc list-inside text-sm text-blue-800 mb-2" {...props} />,
-                        ol: ({...props}) => <ol className="list-decimal list-inside text-sm text-blue-800 mb-2" {...props} />,
+                        h1: ({ ...props }) => (
+                          <h1
+                            className="text-lg font-bold text-blue-900 mb-2"
+                            {...props}
+                          />
+                        ),
+                        h2: ({ ...props }) => (
+                          <h2
+                            className="text-base font-bold text-blue-900 mb-2"
+                            {...props}
+                          />
+                        ),
+                        h3: ({ ...props }) => (
+                          <h3
+                            className="text-sm font-bold text-blue-800 mb-1"
+                            {...props}
+                          />
+                        ),
+                        p: ({ ...props }) => (
+                          <p
+                            className="text-sm text-blue-800 mb-2"
+                            {...props}
+                          />
+                        ),
+                        strong: ({ ...props }) => (
+                          <strong
+                            className="font-bold text-blue-900"
+                            {...props}
+                          />
+                        ),
+                        ul: ({ ...props }) => (
+                          <ul
+                            className="list-disc list-inside text-sm text-blue-800 mb-2"
+                            {...props}
+                          />
+                        ),
+                        ol: ({ ...props }) => (
+                          <ol
+                            className="list-decimal list-inside text-sm text-blue-800 mb-2"
+                            {...props}
+                          />
+                        ),
                       }}
                     >
                       {reasoningSummary}
@@ -618,7 +703,9 @@ export default function GeneratePage() {
                 <div className="bg-white rounded-xl shadow-sm border p-4">
                   <div className="flex items-center gap-2 mb-3 pb-2 border-b">
                     <FileText className="w-4 h-4 text-violet-600" />
-                    <span className="text-sm font-semibold text-gray-700">Document Preview</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      Document Preview
+                    </span>
                   </div>
                   <TiptapEditor
                     content={streamingContent}
@@ -665,7 +752,8 @@ export default function GeneratePage() {
               <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-bold">
-                    Question {currentQuestionIndex + 1}/{dynamicQuestions.length}
+                    Question {currentQuestionIndex + 1}/
+                    {dynamicQuestions.length}
                   </h3>
                   <button
                     onClick={() => {
@@ -706,7 +794,8 @@ export default function GeneratePage() {
                         })
                       }
                       className={`p-4 rounded-xl border-2 ${
-                        answers[dynamicQuestions[currentQuestionIndex].id] === true
+                        answers[dynamicQuestions[currentQuestionIndex].id] ===
+                        true
                           ? "border-green-500 bg-green-50"
                           : "border-gray-200"
                       }`}
@@ -722,7 +811,8 @@ export default function GeneratePage() {
                         })
                       }
                       className={`p-4 rounded-xl border-2 ${
-                        answers[dynamicQuestions[currentQuestionIndex].id] === false
+                        answers[dynamicQuestions[currentQuestionIndex].id] ===
+                        false
                           ? "border-red-500 bg-red-50"
                           : "border-gray-200"
                       }`}
@@ -734,11 +824,16 @@ export default function GeneratePage() {
                 ) : (
                   <div className="space-y-2">
                     <textarea
-                      value={(answers[dynamicQuestions[currentQuestionIndex]?.id] as string) || ""}
+                      value={
+                        (answers[
+                          dynamicQuestions[currentQuestionIndex]?.id
+                        ] as string) || ""
+                      }
                       onChange={(e) =>
                         setAnswers({
                           ...answers,
-                          [dynamicQuestions[currentQuestionIndex].id]: e.target.value,
+                          [dynamicQuestions[currentQuestionIndex].id]:
+                            e.target.value,
                         })
                       }
                       placeholder="Type your answer..."
@@ -754,7 +849,9 @@ export default function GeneratePage() {
                 {currentQuestionIndex > 0 && (
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
+                    onClick={() =>
+                      setCurrentQuestionIndex(currentQuestionIndex - 1)
+                    }
                     size="sm"
                   >
                     Back
@@ -763,9 +860,14 @@ export default function GeneratePage() {
                 <Button
                   onClick={handleNextQuestion}
                   disabled={
-                    answers[dynamicQuestions[currentQuestionIndex]?.id] === undefined ||
+                    answers[dynamicQuestions[currentQuestionIndex]?.id] ===
+                      undefined ||
                     (dynamicQuestions[currentQuestionIndex]?.type === "text" &&
-                      !(answers[dynamicQuestions[currentQuestionIndex]?.id] as string)?.trim())
+                      !(
+                        answers[
+                          dynamicQuestions[currentQuestionIndex]?.id
+                        ] as string
+                      )?.trim())
                   }
                   className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600"
                   size="sm"

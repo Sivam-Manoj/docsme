@@ -44,18 +44,13 @@ export function EmailShareModal({
         });
         toast.success("Email sent successfully!");
       } else {
-        // Open Gmail compose
+        // Use mailto: for native email app (mobile-friendly)
         const subject = `${documentTitle} - Shared Document`;
-        const body = encodeURIComponent(
-          `${message}\n\nDocument: ${documentTitle}\n\nView document: ${window.location.origin}/shared/${documentId}`
-        );
-        window.open(
-          `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${encodeURIComponent(
-            subject
-          )}&body=${body}`,
-          "_blank"
-        );
-        toast.success("Gmail composer opened!");
+        const body = `${message}\n\nDocument: ${documentTitle}\n\nView document: ${window.location.origin}/shared/${documentId}`;
+        
+        // Use mailto: link to open native email app
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        toast.success("Email app opened!");
       }
 
       // Reset form

@@ -24,7 +24,7 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
     >
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50">
@@ -36,22 +36,22 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
 
       <motion.div
         style={{ y, opacity, scale }}
-        className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16"
+        className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8"
       >
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-left space-y-8"
+            className="text-left space-y-6"
           >
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-violet-200 shadow-sm"
+              className="inline-flex items-center mt-4 gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-violet-200 shadow-sm"
             >
               <Sparkles className="w-4 h-4 text-violet-600" />
               <span className="text-sm font-medium text-gray-900">
@@ -60,12 +60,12 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
             </motion.div>
 
             {/* Heading */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
               >
                 <span className="bg-gradient-to-r from-gray-900 via-violet-900 to-purple-900 bg-clip-text text-transparent">
                   Create Stunning
@@ -80,7 +80,7 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-xl text-gray-600 max-w-xl leading-relaxed"
+                className="text-sm sm:text-base md:text-lg text-gray-600 max-w-xl leading-relaxed"
               >
                 Transform your ideas into professional documents with AI. No design
                 skills needed. Just describe what you need, and watch magic happen.
@@ -97,7 +97,7 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
               <Button
                 size="lg"
                 onClick={onTryNow}
-                className="group relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                className="group relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 text-white px-6 py-4 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
@@ -110,7 +110,7 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
               <Button
                 size="lg"
                 variant="outline"
-                className="group border-2 border-gray-300 hover:border-violet-600 px-8 py-6 text-lg font-semibold"
+                className="group border-2 border-gray-300 hover:border-violet-600 px-6 py-4 text-base font-semibold"
               >
                 <Play className="w-5 h-5 mr-2 group-hover:text-violet-600 transition-colors" />
                 Watch Demo
@@ -122,21 +122,19 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="flex items-center gap-8 pt-4"
+              className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-6 pt-3"
             >
-              <div>
-                <div className="text-3xl font-bold text-gray-900">50K+</div>
-                <div className="text-sm text-gray-600">Documents Created</div>
+              <div className="text-center sm:text-left">
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">50K+</div>
+                <div className="text-xs text-gray-600">Documents</div>
               </div>
-              <div className="h-12 w-px bg-gray-300" />
-              <div>
-                <div className="text-3xl font-bold text-gray-900">10K+</div>
-                <div className="text-sm text-gray-600">Happy Users</div>
+              <div className="text-center sm:text-left border-l border-r border-gray-300 px-2 sm:px-0 sm:border-l-0 sm:border-r-0">
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">10K+</div>
+                <div className="text-xs text-gray-600">Users</div>
               </div>
-              <div className="h-12 w-px bg-gray-300" />
-              <div>
-                <div className="text-3xl font-bold text-gray-900">4.9★</div>
-                <div className="text-sm text-gray-600">User Rating</div>
+              <div className="text-center sm:text-left">
+                <div className="text-xl sm:text-2xl font-bold text-gray-900">4.9★</div>
+                <div className="text-xs text-gray-600">Rating</div>
               </div>
             </motion.div>
           </motion.div>
@@ -146,7 +144,7 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative"
+            className="relative hidden lg:block"
           >
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -163,8 +161,8 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
                     <div className="w-3 h-3 rounded-full bg-green-400" />
                   </div>
                   <div className="flex-1 flex justify-center">
-                    <div className="bg-white px-4 py-1 rounded-md text-xs text-gray-600">
-                      docume-ai.com/editor
+                    <div className="bg-white px-3 sm:px-4 py-1 rounded-md text-xs text-gray-600">
+                      docsme-ai.com/editor
                     </div>
                   </div>
                 </div>
@@ -244,7 +242,7 @@ export function HeroSection({ onTryNow }: HeroSectionProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2"
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}

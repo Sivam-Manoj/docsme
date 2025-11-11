@@ -67,7 +67,7 @@ export function StatsCards({ documentsCount, totalViews, plan }: StatsCardsProps
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4 mb-3 sm:mb-4 md:mb-6">
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
@@ -86,28 +86,28 @@ export function StatsCards({ documentsCount, totalViews, plan }: StatsCardsProps
               <div className="absolute inset-[1px] bg-white rounded-lg" />
             </div>
             
-            <CardContent className="relative pt-5 pb-5 sm:pt-6 sm:pb-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium text-gray-500 mb-1.5 sm:mb-2">
+            <CardContent className="relative pt-3 pb-3 sm:pt-4 sm:pb-4 md:pt-5 md:pb-5 px-3 sm:px-4">
+              <div className="flex items-start justify-between gap-1.5 sm:gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1 md:mb-1.5 truncate">
                     {stat.label}
                   </p>
-                  <h3 className={`text-2xl sm:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                  <h3 className={`text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent leading-tight`}>
                     {stat.value}
                   </h3>
                 </div>
                 <motion.div
-                  className={`${stat.iconBg} p-2.5 sm:p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                  className={`${stat.iconBg} p-1.5 sm:p-2 md:p-2.5 rounded-lg sm:rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300 shrink-0`}
                   whileHover={{ rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 0.5 }}
                 >
-                  <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <stat.icon className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-white" />
                 </motion.div>
               </div>
               
               {/* Progress indicator */}
               <motion.div
-                className={`mt-3 sm:mt-4 h-1.5 bg-gray-100 rounded-full overflow-hidden`}
+                className={`mt-2 sm:mt-2.5 md:mt-3 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.1 + 0.3 }}

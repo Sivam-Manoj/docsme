@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Share2, Loader2, Download, FileText, Image, LogOut, X, Home, Check, Edit2, Menu, MoreVertical, Mail } from "lucide-react";
+import { Save, Share2, Loader2, Download, FileText, FileType, LogOut, X, Home, Check, Edit2, Menu, MoreVertical, Mail } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ interface EditorToolbarProps {
   onSave: () => void;
   onToggleShare: () => void;
   onDownloadPDF: () => void;
-  onDownloadImage: () => void;
+  onDownloadDocx: () => void;
   onEmailShare?: () => void;
 }
 
@@ -27,7 +27,7 @@ export function EditorToolbar({
   onSave,
   onToggleShare,
   onDownloadPDF,
-  onDownloadImage,
+  onDownloadDocx,
   onEmailShare,
 }: EditorToolbarProps) {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
@@ -148,13 +148,13 @@ export function EditorToolbar({
               </button>
               <button
                 onClick={() => {
-                  onDownloadImage();
+                  onDownloadDocx();
                   setShowDownloadMenu(false);
                 }}
                 className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
               >
-                <Image className="w-4 h-4" />
-                Download as Image
+                <FileType className="w-4 h-4" />
+                Download as DOCX
               </button>
               </div>
             </>
@@ -214,13 +214,13 @@ export function EditorToolbar({
                 </button>
                 <button
                   onClick={() => {
-                    onDownloadImage();
+                    onDownloadDocx();
                     setShowMobileMenu(false);
                   }}
                   className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 flex items-center gap-3"
                 >
-                  <Image className="w-4 h-4" />
-                  Download as Image
+                  <FileType className="w-4 h-4" />
+                  Download as DOCX
                 </button>
                 <div className="border-t my-1" />
                 <button

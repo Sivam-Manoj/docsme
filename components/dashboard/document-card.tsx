@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Eye, Edit2, Trash2, ExternalLink, FileText, Download, Image } from "lucide-react";
+import { Calendar, Eye, Edit2, Trash2, ExternalLink, FileText, Download, FileType } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useState } from "react";
 
@@ -53,7 +53,7 @@ interface DocumentCardProps {
 export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
-  const handleDownload = (format: 'pdf' | 'image') => {
+  const handleDownload = (format: 'pdf' | 'docx') => {
     setShowDownloadMenu(false);
     
     // Store download preference in sessionStorage
@@ -133,7 +133,7 @@ export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
+          <div className="flex flex-wrap gap-2 pt-2">
             <Link href={`/editor/${document._id}`} className="flex-1">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
@@ -184,11 +184,11 @@ export function DocumentCard({ document, onDelete, index }: DocumentCardProps) {
                       Download PDF
                     </button>
                     <button
-                      onClick={() => handleDownload('image')}
+                      onClick={() => handleDownload('docx')}
                       className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2 transition-colors"
                     >
-                      <Image className="w-4 h-4" />
-                      Download Image
+                      <FileType className="w-4 h-4" />
+                      Download DOCX
                     </button>
                   </motion.div>
                 </>
