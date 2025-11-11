@@ -225,7 +225,7 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-white to-purple-50 overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 overflow-hidden">
       <AnimatePresence mode="wait">
         {/* Close Button */}
         <motion.button
@@ -234,9 +234,9 @@ export default function GeneratePage() {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={() => router.push("/dashboard")}
-          className="fixed top-6 right-6 z-50 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl hover:bg-white transition-all duration-300 group"
+          className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 p-2.5 sm:p-3 bg-white/95 backdrop-blur-md rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 group"
         >
-          <X className="w-6 h-6 text-gray-700 group-hover:text-violet-600 transition-colors" />
+          <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 group-hover:text-violet-600 transition-colors" />
         </motion.button>
 
         {/* Main Content */}
@@ -246,179 +246,269 @@ export default function GeneratePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="h-full flex flex-col p-2 sm:p-3 md:p-4 overflow-hidden"
+            className="h-full flex flex-col items-center p-4 sm:p-6 md:p-8 overflow-y-auto"
           >
-            {/* Ultra Compact Header */}
+            {/* Modern Header */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-center mb-1.5 shrink-0"
+              className="text-center mb-6 sm:mb-8"
             >
-              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-0.5">
-                Create Document
+              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 mb-4 bg-gradient-to-br from-violet-600 to-purple-600 rounded-2xl shadow-xl">
+                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                Create Your Document
               </h1>
-              <p className="text-gray-600 text-[10px] sm:text-xs">
-                Powered by GPT-5
+              <p className="text-sm sm:text-base text-gray-600 font-medium">
+                ✨ Powered by GPT-5 AI Technology
               </p>
             </motion.div>
 
-            {/* Main Card - Ultra Compact */}
+            {/* Main Card - Beautiful Modern Design */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-violet-200 flex flex-col min-h-0 flex-1 w-full max-w-none"
+              className="bg-white rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-4xl"
             >
-              <div className="p-2 sm:p-3 md:p-3 overflow-y-auto space-y-2 md:space-y-0 md:grid md:grid-cols-12 md:gap-2">
-                {/* Question Mode Toggle - Ultra Compact */}
-                <div className="md:col-span-12 col-span-12 flex items-center justify-between p-1.5 bg-gradient-to-r from-violet-50 to-purple-50 rounded border border-violet-200">
-                  <div className="flex items-start gap-1.5">
-                    <MessageCircleQuestion className="w-3.5 h-3.5 text-violet-600 mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-xs text-gray-900">AI Question Mode</p>
-                      <p className="text-[10px] text-gray-600">When enabled, AI asks targeted questions based on your request to craft the best document.</p>
+              <div className="p-4 sm:p-6 md:p-8 space-y-6">
+                {/* AI Question Mode Toggle - Modern Card */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center justify-between p-4 sm:p-5 bg-gradient-to-r from-violet-50 via-purple-50 to-pink-50 rounded-xl border-2 border-violet-200 hover:border-violet-300 transition-colors"
+                >
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center shrink-0 shadow-lg">
+                      <MessageCircleQuestion className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-sm sm:text-base text-gray-900 mb-1">
+                        AI Question Mode
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                        AI asks targeted questions to understand your needs and craft the perfect document
+                      </p>
                     </div>
                   </div>
                   <button
                     onClick={() => setQuestionMode(!questionMode)}
                     disabled={isGeneratingQuestions}
-                    className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${questionMode ? "bg-violet-600" : "bg-gray-300"}`}
+                    className={`relative inline-flex h-7 w-14 sm:h-8 sm:w-16 items-center rounded-full transition-all duration-300 shrink-0 ml-3 ${
+                      questionMode ? "bg-gradient-to-r from-violet-600 to-purple-600 shadow-lg" : "bg-gray-300"
+                    }`}
                   >
-                    <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${questionMode ? "translate-x-4" : "translate-x-0.5"}`} />
+                    <span
+                      className={`inline-block h-5 w-5 sm:h-6 sm:w-6 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
+                        questionMode ? "translate-x-8 sm:translate-x-9" : "translate-x-1"
+                      }`}
+                    />
                   </button>
-                </div>
+                </motion.div>
 
-                {/* Document Type - Ultra Compact */}
-                <div className="space-y-1 md:col-span-4 col-span-12">
-                  <label className="text-[10px] font-semibold text-gray-900 flex items-center gap-1">
-                    <FileText className="w-3 h-3 text-violet-600" />
+                {/* Document Type - Beautiful Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="space-y-3"
+                >
+                  <label className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-white" />
+                    </div>
                     Document Type
                   </label>
-                  <div className="grid grid-cols-4 gap-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {docTypes.map((type) => (
                       <button
                         key={type.id}
                         onClick={() => setDocType(type.id as DocType)}
                         disabled={isGeneratingQuestions}
-                        className={`p-1 rounded border-2 transition-all ${docType === type.id ? "border-violet-500 bg-violet-50" : "border-gray-200 hover:border-violet-300"}`}
+                        className={`group p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 ${
+                          docType === type.id
+                            ? "border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 shadow-lg"
+                            : "border-gray-200 hover:border-violet-300 hover:shadow-md"
+                        }`}
                       >
-                        <type.icon className={`w-3.5 h-3.5 mx-auto mb-0.5 ${docType === type.id ? "text-violet-600" : "text-gray-500"}`} />
-                        <p className="font-semibold text-[10px] text-gray-900">{type.label}</p>
+                        <type.icon
+                          className={`w-6 h-6 sm:w-7 sm:h-7 mx-auto mb-2 transition-colors ${
+                            docType === type.id ? "text-violet-600" : "text-gray-500 group-hover:text-violet-500"
+                          }`}
+                        />
+                        <p className="font-bold text-xs sm:text-sm text-gray-900">{type.label}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5">{type.desc}</p>
                       </button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Thinking Mode */}
-                <div className="space-y-1 md:col-span-4 col-span-12">
-                  <label className="text-[10px] font-semibold text-gray-900 flex items-center gap-1">
-                    <Brain className="w-3 h-3 text-violet-600" />
+                {/* Thinking Mode - Beautiful Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-3"
+                >
+                  <label className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-white" />
+                    </div>
                     Thinking Mode
                   </label>
-                  <p className="text-[10px] text-gray-500">High = slower, best for complex tasks and info points</p>
-                  <div className="grid grid-cols-2 gap-1">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                    💡 High = Slower but handles complex tasks better
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
-                      { id: "minimal", label: "Minimal" },
-                      { id: "low", label: "Low" },
-                      { id: "medium", label: "Medium" },
-                      { id: "high", label: "High" },
+                      { id: "minimal", label: "Minimal", emoji: "⚡" },
+                      { id: "low", label: "Low", emoji: "🔥" },
+                      { id: "medium", label: "Medium", emoji: "💪" },
+                      { id: "high", label: "High", emoji: "🧠" },
                     ].map((opt) => (
                       <button
                         key={opt.id}
                         onClick={() => setEffort(opt.id)}
                         disabled={isGeneratingQuestions}
-                        className={`p-1 rounded border-2 transition-all ${effort === opt.id ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
+                        className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                          effort === opt.id
+                            ? "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-md scale-105"
+                            : "border-gray-200 hover:border-blue-300 hover:shadow-sm"
+                        }`}
                       >
-                        <p className="text-[11px] font-medium">{opt.label}</p>
+                        <div className="text-lg mb-1">{opt.emoji}</div>
+                        <p className="text-xs sm:text-sm font-semibold text-gray-900">{opt.label}</p>
                       </button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Output Size */}
-                <div className="space-y-1 md:col-span-4 col-span-12">
-                  <label className="text-[10px] font-semibold text-gray-900 flex items-center gap-1">
-                    <Zap className="w-3 h-3 text-violet-600" />
+                {/* Output Size - Beautiful Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="space-y-3"
+                >
+                  <label className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-white" />
+                    </div>
                     Output Size
                   </label>
-                  <p className="text-[10px] text-gray-500">High = longer text length</p>
-                  <div className="grid grid-cols-3 gap-1">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                    📏 High = More detailed and longer content
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: "low", label: "Low" },
-                      { id: "medium", label: "Medium" },
-                      { id: "high", label: "High" },
+                      { id: "low", label: "Short", emoji: "📝" },
+                      { id: "medium", label: "Medium", emoji: "📄" },
+                      { id: "high", label: "Long", emoji: "📚" },
                     ].map((opt) => (
                       <button
                         key={opt.id}
                         onClick={() => setVerbosity(opt.id)}
                         disabled={isGeneratingQuestions}
-                        className={`p-1 rounded border-2 transition-all ${verbosity === opt.id ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-green-300"}`}
+                        className={`p-3 rounded-lg border-2 transition-all duration-300 ${
+                          verbosity === opt.id
+                            ? "border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 shadow-md scale-105"
+                            : "border-gray-200 hover:border-green-300 hover:shadow-sm"
+                        }`}
                       >
-                        <p className="text-[11px] font-medium">{opt.label}</p>
+                        <div className="text-lg mb-1">{opt.emoji}</div>
+                        <p className="text-xs sm:text-sm font-semibold text-gray-900">{opt.label}</p>
                       </button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Prompt Input - Ultra Compact */}
-                <div className="space-y-1 md:col-span-12 col-span-12">
-                  <label className="text-[10px] font-semibold text-gray-900">Prompt</label>
-                  <div className="flex gap-1.5">
+                {/* Prompt Input - Modern Design */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="space-y-3"
+                >
+                  <label className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    Your Idea
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <textarea
-                      placeholder="Describe your document..."
+                      placeholder="Describe what you want to create... Be as detailed as you like! 💭"
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
-                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded focus:border-violet-500 focus:ring-1 focus:ring-violet-100 outline-none resize-none text-xs"
+                      className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-violet-500 focus:ring-4 focus:ring-violet-100 outline-none resize-none text-sm sm:text-base transition-all duration-300 min-h-[100px] sm:min-h-[120px]"
                       disabled={isGeneratingQuestions}
-                      rows={2}
                     />
-                    <div className="shrink-0">
+                    <div className="shrink-0 self-end sm:self-start">
                       <VoiceRecorder onTranscript={handleVoiceTranscript} />
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Generate Button - Compact */}
-                <Button
-                  onClick={questionMode ? handleGenerateQuestions : handleGenerate}
-                  disabled={isGeneratingQuestions || !prompt.trim()}
-                  className="md:col-span-12 col-span-12 w-full h-9 text-xs font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700"
+                {/* Generate Button - Big & Beautiful */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
                 >
-                  {isGeneratingQuestions ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                      Loading...
-                    </>
-                  ) : questionMode ? (
-                    <>
-                      <MessageCircleQuestion className="w-3.5 h-3.5 mr-1.5" />
-                      Questions
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                      Generate
-                    </>
-                  )}
-                </Button>
+                  <Button
+                    onClick={questionMode ? handleGenerateQuestions : handleGenerate}
+                    disabled={isGeneratingQuestions || !prompt.trim()}
+                    className="w-full h-14 sm:h-16 text-base sm:text-lg font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 hover:from-violet-700 hover:via-purple-700 hover:to-pink-700 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {isGeneratingQuestions ? (
+                      <>
+                        <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 animate-spin" />
+                        Generating Questions...
+                      </>
+                    ) : questionMode ? (
+                      <>
+                        <MessageCircleQuestion className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                        Start with AI Questions
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                        Generate Document Now
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
 
-                {/* Quick Suggestions - Ultra Compact (Hidden on small screens) */}
-                <div className="hidden sm:block space-y-1 pt-1.5 border-t border-gray-200 md:col-span-12 col-span-12">
-                  <p className="text-[10px] font-semibold text-gray-700 text-center">Quick Start</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
-                    {quickSuggestions.slice(0, 4).map((suggestion, idx) => (
-                      <button
+                {/* Quick Suggestions - Beautiful Chips */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className="space-y-3 pt-4 border-t-2 border-gray-100"
+                >
+                  <p className="text-xs sm:text-sm font-bold text-gray-700 text-center flex items-center justify-center gap-2">
+                    <span className="text-lg">✨</span>
+                    Quick Start Ideas
+                    <span className="text-lg">✨</span>
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {quickSuggestions.map((suggestion, idx) => (
+                      <motion.button
                         key={idx}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setPrompt(suggestion)}
                         disabled={isGeneratingQuestions}
-                        className="text-[10px] px-1.5 py-1 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white rounded shadow-sm font-medium truncate"
+                        className="text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 hover:from-violet-600 hover:via-purple-600 hover:to-pink-600 text-white rounded-full shadow-md hover:shadow-lg font-semibold transition-all duration-300"
                       >
                         {suggestion}
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
