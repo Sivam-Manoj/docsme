@@ -61,10 +61,10 @@ export default {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         await connectDB();
-        const existingUser = await User.findOne({ email: user.email });
+        let dbUser = await User.findOne({ email: user.email });
 
-        if (!existingUser) {
-          await User.create({
+        if (!dbUser) {
+          dbUser = await User.create({
             name: user.name,
             email: user.email,
             image: user.image,
@@ -78,13 +78,27 @@ export default {
             },
           });
         }
+        
+        // Store MongoDB _id in the user object for JWT callback
+        user.id = (dbUser._id as any).toString();
       }
       return true;
     },
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session, account }) {
+      // On first sign in, store the MongoDB _id
       if (user) {
         token.id = user.id;
       }
+      
+      // For Google OAuth, ensure we always have the correct MongoDB _id
+      if (account?.provider === "google" && token.email) {
+        await connectDB();
+        const dbUser = await User.findOne({ email: token.email });
+        if (dbUser) {
+          token.id = (dbUser._id as any).toString();
+        }
+      }
+      
       if (trigger === "update" && session) {
         token = { ...token, ...session };
       }

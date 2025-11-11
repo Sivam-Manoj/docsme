@@ -565,10 +565,10 @@ export default function GeneratePage() {
             animate={{ opacity: 1 }}
             className="bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-5xl h-[85vh] sm:h-[90vh] md:h-[85vh] overflow-hidden flex flex-col"
           >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 shrink-0">
-              <div className="flex items-center justify-between gap-1 sm:gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            {/* Header - Mobile Optimized */}
+            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 shrink-0">
+              <div className="flex items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{
@@ -578,56 +578,56 @@ export default function GeneratePage() {
                     }}
                     className="shrink-0"
                   >
-                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                    <Sparkles className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                   </motion.div>
                   <div className="min-w-0">
-                    <h2 className="text-xs sm:text-sm md:text-lg font-bold text-white truncate leading-tight">
+                    <h2 className="text-sm sm:text-sm md:text-lg font-bold text-white truncate leading-tight">
                       {generatedDocId
                         ? "✨ Complete!"
                         : isReasoning
                         ? "🧠 Thinking..."
                         : "✍️ Writing..."}
                     </h2>
-                    <p className="text-[10px] sm:text-xs text-white/90">
+                    <p className="text-[11px] sm:text-xs text-white/90">
                       {characterCount} chars
                     </p>
                   </div>
                 </div>
 
-                {/* Controls */}
-                <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
+                {/* Controls - Better Touch Targets */}
+                <div className="flex items-center gap-2 shrink-0">
                   {generatedDocId ? (
-                    <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-400" />
+                    <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-green-400" />
                   ) : (
                     <>
-                      {/* Auto-scroll toggle button */}
+                      {/* Auto-scroll toggle button - Icon only on mobile */}
                       <button
                         onClick={() => setAutoScroll(!autoScroll)}
-                        className={`flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 rounded-md sm:rounded-lg transition-all text-[10px] sm:text-xs md:text-sm font-medium ${
+                        className={`flex items-center justify-center min-w-[36px] sm:min-w-0 sm:gap-1 px-2 sm:px-2.5 md:px-3 py-2 sm:py-1.5 md:py-2 rounded-lg transition-all text-xs sm:text-xs md:text-sm font-bold shadow-md ${
                           autoScroll
                             ? "bg-white text-violet-600"
-                            : "bg-white/20 text-white"
-                        } hover:bg-white hover:text-violet-600`}
+                            : "bg-white/20 text-white hover:bg-white/30"
+                        } active:scale-95`}
                         title={
                           autoScroll
                             ? "Auto-scroll is On"
                             : "Auto-scroll is Off"
                         }
                       >
-                        <ScrollText className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline">
+                        <ScrollText className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline whitespace-nowrap">
                           {autoScroll ? "On" : "Off"}
                         </span>
                       </button>
 
-                      {/* Stop button */}
+                      {/* Stop button - Always visible */}
                       <button
                         onClick={handleStopGeneration}
-                        className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 md:px-3 py-1 sm:py-1.5 md:py-2 bg-red-500/90 hover:bg-red-600 text-white rounded-md sm:rounded-lg transition-all text-[10px] sm:text-xs md:text-sm font-medium"
+                        className="flex items-center justify-center gap-1 min-w-[36px] sm:min-w-0 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-2 sm:py-1.5 md:py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all text-xs sm:text-xs md:text-sm font-bold shadow-md active:scale-95"
                         title="Stop Generation"
                       >
-                        <StopCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline">Stop</span>
+                        <StopCircle className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4" />
+                        <span className="hidden sm:inline whitespace-nowrap">Stop</span>
                       </button>
                     </>
                   )}
@@ -749,9 +749,9 @@ export default function GeneratePage() {
               exit={{ opacity: 0, scale: 0.9 }}
               className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden"
             >
-              <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white p-4">
+              <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-bold">
+                  <h3 className="text-base sm:text-lg font-bold">
                     Question {currentQuestionIndex + 1}/
                     {dynamicQuestions.length}
                   </h3>
@@ -762,9 +762,10 @@ export default function GeneratePage() {
                       setCurrentQuestionIndex(0);
                       setDynamicQuestions([]);
                     }}
-                    className="text-white hover:bg-white/20 p-1 rounded"
+                    className="text-white hover:bg-white/20 active:bg-white/30 p-2 rounded-lg transition-all active:scale-95"
+                    aria-label="Close modal"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-5 h-5 sm:w-6 sm:h-6" />
                   </button>
                 </div>
                 <div className="flex gap-1">
@@ -779,8 +780,8 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <div className="p-4 overflow-y-auto flex-1">
-                <label className="text-base font-bold text-gray-900 block mb-3">
+              <div className="p-3 sm:p-4 overflow-y-auto flex-1">
+                <label className="text-sm sm:text-base font-bold text-gray-900 block mb-3">
                   {dynamicQuestions[currentQuestionIndex]?.question}
                 </label>
 
@@ -845,14 +846,14 @@ export default function GeneratePage() {
                 )}
               </div>
 
-              <div className="p-4 border-t bg-gray-50 flex gap-2">
+              <div className="p-3 sm:p-4 border-t bg-gray-50 flex gap-2">
                 {currentQuestionIndex > 0 && (
                   <Button
                     variant="outline"
                     onClick={() =>
                       setCurrentQuestionIndex(currentQuestionIndex - 1)
                     }
-                    size="sm"
+                    className="h-10 sm:h-9 px-4 font-semibold"
                   >
                     Back
                   </Button>
@@ -869,8 +870,7 @@ export default function GeneratePage() {
                         ] as string
                       )?.trim())
                   }
-                  className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600"
-                  size="sm"
+                  className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 h-10 sm:h-9 font-semibold"
                 >
                   {currentQuestionIndex === dynamicQuestions.length - 1 ? (
                     <>
