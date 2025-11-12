@@ -17,7 +17,6 @@ import {
   ArrowRight,
   CheckCircle2,
   StopCircle,
-  ScrollText,
   Upload,
   Image as ImageIcon,
   File,
@@ -57,7 +56,6 @@ export default function GeneratePage() {
   const [reasoningSummary, setReasoningSummary] = useState("");
   const [isReasoning, setIsReasoning] = useState(false);
   const [characterCount, setCharacterCount] = useState(0);
-  const [autoScroll, setAutoScroll] = useState(true);
   const streamingViewRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   
@@ -274,23 +272,21 @@ export default function GeneratePage() {
                   setCharacterCount(fullReasoning.length);
                 }
 
-                // Smooth auto-scroll during reasoning (only if enabled)
-                if (autoScroll) {
-                  setTimeout(() => {
-                    if (streamingViewRef.current) {
-                      const element = streamingViewRef.current;
-                      const scrollHeight = element.scrollHeight;
-                      const clientHeight = element.clientHeight;
-                      // Keep content centered: scroll to show last line in middle
-                      const targetScroll = Math.max(0, scrollHeight - clientHeight / 2);
-                      
-                      element.scrollTo({
-                        top: targetScroll,
-                        behavior: "smooth",
-                      });
-                    }
-                  }, 150);
-                }
+                // Smart scroll: follow the last line smoothly
+                setTimeout(() => {
+                  if (streamingViewRef.current) {
+                    const element = streamingViewRef.current;
+                    const scrollHeight = element.scrollHeight;
+                    const clientHeight = element.clientHeight;
+                    const maxScroll = scrollHeight - clientHeight;
+                    
+                    // Smooth scroll to bottom with a small offset to show the last line
+                    element.scrollTo({
+                      top: maxScroll,
+                      behavior: "smooth",
+                    });
+                  }
+                }, 100);
               }
 
               // Handle content streaming
@@ -304,29 +300,25 @@ export default function GeneratePage() {
                 setStreamingContent(fullContent);
                 setCharacterCount(fullContent.length);
 
-                // Smooth auto-scroll to follow content (only if enabled)
-                if (autoScroll) {
-                  setTimeout(() => {
-                    if (streamingViewRef.current) {
-                      const element = streamingViewRef.current;
-                      const scrollHeight = element.scrollHeight;
-                      const clientHeight = element.clientHeight;
-                      const currentScroll = element.scrollTop;
-                      
-                      // Keep last line centered vertically
-                      const targetScroll = Math.max(0, scrollHeight - clientHeight / 2);
-                      const distance = Math.abs(targetScroll - currentScroll);
-
-                      // Only scroll if we're not already near the target (reduced sensitivity)
-                      if (distance > 30) {
-                        element.scrollTo({
-                          top: targetScroll,
-                          behavior: distance > 500 ? "auto" : "smooth",
-                        });
-                      }
+                // Smart scroll: follow the last line of content
+                setTimeout(() => {
+                  if (streamingViewRef.current) {
+                    const element = streamingViewRef.current;
+                    const scrollHeight = element.scrollHeight;
+                    const clientHeight = element.clientHeight;
+                    const currentScroll = element.scrollTop;
+                    const maxScroll = scrollHeight - clientHeight;
+                    
+                    // Only scroll if content has grown beyond current view
+                    // This keeps the last line visible without aggressive scrolling
+                    if (maxScroll > currentScroll) {
+                      element.scrollTo({
+                        top: maxScroll,
+                        behavior: "smooth",
+                      });
                     }
-                  }, 50);
-                }
+                  }
+                }, 100);
               }
 
               if (data.done) {
@@ -676,26 +668,6 @@ export default function GeneratePage() {
                     </>
                   ) : (
                     <>
-                      {/* Auto-scroll toggle button - Icon only on mobile */}
-                      <button
-                        onClick={() => setAutoScroll(!autoScroll)}
-                        className={`flex items-center justify-center min-w-[36px] sm:min-w-0 sm:gap-1 px-2 sm:px-2.5 md:px-3 py-2 sm:py-1.5 md:py-2 rounded-lg transition-all text-xs sm:text-xs md:text-sm font-bold shadow-md ${
-                          autoScroll
-                            ? "bg-white text-violet-600"
-                            : "bg-white/20 text-white hover:bg-white/30"
-                        } active:scale-95`}
-                        title={
-                          autoScroll
-                            ? "Auto-scroll is On - Click to disable"
-                            : "Auto-scroll is Off - Click to enable"
-                        }
-                      >
-                        <ScrollText className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4" />
-                        <span className="hidden sm:inline whitespace-nowrap">
-                          {autoScroll ? "On" : "Off"}
-                        </span>
-                      </button>
-
                       {/* Stop button - Always visible */}
                       <button
                         onClick={handleStopGeneration}
