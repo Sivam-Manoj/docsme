@@ -414,7 +414,7 @@ export default function GeneratePage() {
                   <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
                     Create Document
                   </h1>
-                  <p className="text-xs text-white/90">Powered by GPT-5</p>
+                  <p className="text-xs text-white/90">Powered by AI</p>
                 </div>
               </div>
             </div>

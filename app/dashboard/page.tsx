@@ -10,6 +10,7 @@ import { StatsCards } from "@/components/dashboard/stats-cards";
 import { CreateDocumentCard } from "@/components/dashboard/create-document-card";
 import { DocumentCard } from "@/components/dashboard/document-card";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { DeleteModal } from "@/components/dashboard/delete-modal";
 import { Loader2, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
@@ -40,6 +41,8 @@ export default function DashboardPage() {
     documentsCount: 0,
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [documentToDelete, setDocumentToDelete] = useState<{ id: string; title: string } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -159,15 +162,22 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this document?")) return;
+  const handleDeleteClick = (id: string, title: string) => {
+    setDocumentToDelete({ id, title });
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!documentToDelete) return;
 
     try {
-      await axios.delete(`/api/documents/${id}`);
-      toast.success("Document deleted");
+      await axios.delete(`/api/documents/${documentToDelete.id}`);
+      toast.success("Document deleted successfully");
       fetchDocuments();
     } catch (error) {
       toast.error("Failed to delete document");
+    } finally {
+      setDocumentToDelete(null);
     }
   };
 
@@ -235,7 +245,7 @@ export default function DashboardPage() {
       <Navbar />
 
       <main className={`relative z-10 mx-auto transition-all duration-300 ${
-        isCreating ? "fixed inset-0 top-16 p-0 max-w-none w-full h-[calc(100vh-4rem)] overflow-hidden" : "max-w-7xl px-3 sm:px-4 md:px-6 lg:px-8 pt-16 sm:pt-20 pb-4 sm:pb-6"
+        isCreating ? "fixed inset-0 top-16 p-0 max-w-none w-full h-[calc(100vh-4rem)] overflow-hidden" : "max-w-7xl px-4 sm:px-6 md:px-8 lg:px-10 pt-20 sm:pt-24 pb-8 sm:pb-12"
       }`}>
         {/* Header - Hide when creating */}
         {!isCreating && (
@@ -243,9 +253,9 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-3 sm:mb-4 md:mb-6"
+            className="mb-6 sm:mb-8"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-0.5 sm:mb-1 leading-tight truncate">
                   Welcome back, {session?.user?.name?.split(' ')[0]}! 👋
@@ -349,13 +359,13 @@ export default function DashboardPage() {
                       },
                     },
                   }}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5 md:gap-4"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6"
                 >
                   {documents.map((doc, index) => (
                     <DocumentCard
                       key={doc._id}
                       document={doc}
-                      onDelete={handleDelete}
+                      onDelete={(id) => handleDeleteClick(id, doc.title)}
                       index={index}
                     />
                   ))}
@@ -365,6 +375,17 @@ export default function DashboardPage() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDocumentToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        documentTitle={documentToDelete?.title || ""}
+      />
     </div>
   );
 }

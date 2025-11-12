@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Loader2, Sparkles, X } from "lucide-react";
+import { Loader2, Sparkles, X, Share2, Info } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -565,7 +565,13 @@ export default function EditorPage({
               <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between rounded-t-lg">
                 <div className="flex items-center gap-2 font-semibold text-gray-800">
                   <Sparkles className="w-5 h-5 text-violet-600" />
-                  AI Assistant
+                  <span>Rewrite with AI</span>
+                  <button
+                    title="Select any text in your document to rewrite, improve, expand, or transform it using AI. The AI will help you enhance your content based on your instructions."
+                    className="text-gray-400 hover:text-violet-600 transition-colors"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
                 </div>
                 <button
                   onClick={() => setShowAIPanel(false)}
@@ -581,13 +587,6 @@ export default function EditorPage({
                   isRewriting={isRewriting}
                   onRewrite={handleAIRewrite}
                 />
-                {showShareDialog && (
-                  <SharePanel
-                    isPublic={document.isPublic}
-                    shareableLink={document.shareableLink}
-                    onMakePublic={handleShare}
-                  />
-                )}
               </div>
             </div>
           )}
@@ -642,18 +641,38 @@ export default function EditorPage({
                   isRewriting={isRewriting}
                   onRewrite={handleAIRewrite}
                 />
-                {showShareDialog && (
-                  <SharePanel
-                    isPublic={document.isPublic}
-                    shareableLink={document.shareableLink}
-                    onMakePublic={handleShare}
-                  />
-                )}
               </div>
             </div>
           </>
         )}
       </div>
+
+      {/* Share Dialog Modal */}
+      {showShareDialog && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="bg-linear-to-r from-violet-600 to-purple-600 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Share2 className="w-5 h-5" />
+                Share Document
+              </h2>
+              <button
+                onClick={() => setShowShareDialog(false)}
+                className="w-8 h-8 rounded-lg hover:bg-white/20 flex items-center justify-center transition-colors"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+            <div className="p-6">
+              <SharePanel
+                isPublic={document.isPublic}
+                shareableLink={document.shareableLink}
+                onMakePublic={handleShare}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Email Share Modal */}
       <EmailShareModal
