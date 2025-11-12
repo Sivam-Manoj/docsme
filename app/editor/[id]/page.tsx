@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { Loader2, Sparkles, X } from "lucide-react";
+import { toast } from "sonner";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
@@ -49,6 +49,7 @@ export default function EditorPage({
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showChartModal, setShowChartModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
   );
@@ -478,13 +479,13 @@ export default function EditorPage({
       />
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="grid lg:grid-cols-[1fr_320px] gap-3 sm:gap-4 p-2 sm:p-3 lg:p-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
+        <div className="grid lg:grid-cols-[1fr_360px] gap-4 p-2 sm:p-3 lg:p-4">
           {/* Editor Canvas */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden order-2 lg:order-1">
+          <div className="bg-white rounded-lg shadow-sm flex flex-col">
             {/* Sticky Tiptap Formatting Toolbar */}
             {editorInstance && (
-              <div className="sticky top-0 z-20 bg-white border-b">
+              <div className="sticky top-0 z-30 bg-white border-b shadow-sm">
                 <TiptapToolbar
                   editor={editorInstance}
                   fontSize={document.styling.fontSize}
@@ -522,43 +523,117 @@ export default function EditorPage({
             )}
 
             {/* Tiptap Editor */}
-            <div ref={contentRef} data-pdf-content>
-              <TiptapEditor
-                content={document.content}
-                onChange={(html) => setDocument({ ...document, content: html })}
-                onSelectionChange={setSelectedText}
-                onEditorReady={setEditorInstance}
-                fontSize={document.styling.fontSize}
-                fontFamily={document.styling.fontFamily}
-                textColor={document.styling.textColor}
-                backgroundColor={document.styling.backgroundColor}
-              />
-            </div>
-          </div>
-
-          {/* Right Panel */}
-          <div className="space-y-3 sm:space-y-4 order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
-            {/* AI Rewrite Panel - Compact on Mobile */}
-            <div className="lg:block">
-              <AIRewritePanel
-                selectedText={selectedText}
-                isRewriting={isRewriting}
-                onRewrite={handleAIRewrite}
-              />
-            </div>
-
-            {/* Share Panel - Compact on Mobile */}
-            {showShareDialog && (
-              <div className="lg:block">
-                <SharePanel
-                  isPublic={document.isPublic}
-                  shareableLink={document.shareableLink}
-                  onMakePublic={handleShare}
+            <div className="flex-1 overflow-y-auto">
+              <div ref={contentRef} data-pdf-content>
+                <TiptapEditor
+                  content={document.content}
+                  onChange={(html) => setDocument({ ...document, content: html })}
+                  onSelectionChange={setSelectedText}
+                  onEditorReady={setEditorInstance}
+                  fontSize={document.styling.fontSize}
+                  fontFamily={document.styling.fontFamily}
+                  textColor={document.styling.textColor}
+                  backgroundColor={document.styling.backgroundColor}
                 />
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Right Panel - Desktop (toggleable) */}
+          {showAIPanel && (
+            <div className="hidden lg:flex flex-col sticky top-4 self-start max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg border bg-white shadow-sm">
+              {/* Header */}
+              <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between rounded-t-lg">
+                <div className="flex items-center gap-2 font-semibold text-gray-800">
+                  <Sparkles className="w-5 h-5 text-violet-600" />
+                  AI Assistant
+                </div>
+                <button
+                  onClick={() => setShowAIPanel(false)}
+                  className="w-8 h-8 rounded-md hover:bg-gray-100 flex items-center justify-center"
+                  title="Close"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+              <div className="p-4 space-y-4">
+                <AIRewritePanel
+                  selectedText={selectedText}
+                  isRewriting={isRewriting}
+                  onRewrite={handleAIRewrite}
+                />
+                {showShareDialog && (
+                  <SharePanel
+                    isPublic={document.isPublic}
+                    shareableLink={document.shareableLink}
+                    onMakePublic={handleShare}
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Mobile AI Panel - Floating Button */}
+        <button
+          onClick={() => setShowAIPanel(!showAIPanel)}
+          className="lg:hidden fixed bottom-6 right-6 z-40 w-14 h-14 bg-linear-to-r from-violet-600 to-purple-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label="Toggle AI Assistant"
+        >
+          <Sparkles className="w-6 h-6" />
+        </button>
+
+        {/* Desktop AI Panel - Floating Button (when closed) */}
+        {!showAIPanel && (
+          <button
+            onClick={() => setShowAIPanel(true)}
+            className="hidden lg:flex fixed bottom-6 right-6 z-30 px-4 h-11 items-center gap-2 rounded-full bg-gray-900 text-white shadow-xl hover:bg-gray-800"
+            aria-label="Open AI Assistant"
+          >
+            <Sparkles className="w-5 h-5 text-violet-300" />
+            <span className="text-sm font-medium">AI Assistant</span>
+          </button>
+        )}
+
+        {/* Mobile AI Panel - Side Drawer */}
+        {showAIPanel && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+              onClick={() => setShowAIPanel(false)}
+            />
+            {/* Drawer */}
+            <div className="lg:hidden fixed right-0 top-0 bottom-0 w-[85vw] max-w-sm bg-white z-50 shadow-2xl transform transition-transform duration-300 overflow-y-auto">
+              <div className="sticky top-0 bg-linear-to-r from-violet-600 to-purple-600 text-white p-4 flex items-center justify-between">
+                <h2 className="font-bold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  AI Assistant
+                </h2>
+                <button
+                  onClick={() => setShowAIPanel(false)}
+                  className="w-8 h-8 rounded-lg hover:bg-white/20 flex items-center justify-center"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-4 space-y-4">
+                <AIRewritePanel
+                  selectedText={selectedText}
+                  isRewriting={isRewriting}
+                  onRewrite={handleAIRewrite}
+                />
+                {showShareDialog && (
+                  <SharePanel
+                    isPublic={document.isPublic}
+                    shareableLink={document.shareableLink}
+                    onMakePublic={handleShare}
+                  />
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Email Share Modal */}

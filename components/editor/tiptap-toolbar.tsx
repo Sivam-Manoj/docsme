@@ -92,10 +92,8 @@ export function TiptapToolbar({
   };
 
   return (
-    <div className="border-b border-gray-200 bg-gray-50 sticky top-0 z-10">
-      {/* Mobile: Scrollable Toolbar */}
-      <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex gap-1 sm:gap-2 items-center p-2 sm:p-3 min-w-max">
+    <div className="border-b border-gray-200 bg-white">
+      <div className="flex flex-wrap items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 w-full">
           {/* History */}
           <div className="flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
             <Button
@@ -250,8 +248,8 @@ export function TiptapToolbar({
             </div>
           </div>
 
-          {/* Headings */}
-          <div className="flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
+          {/* Headings (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
             <Button
               size="sm"
               variant={editor.isActive("heading", { level: 1 }) ? "default" : "ghost"}
@@ -281,8 +279,8 @@ export function TiptapToolbar({
             </Button>
           </div>
 
-          {/* Lists */}
-          <div className="flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
+          {/* Lists (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
             <Button
               size="sm"
               variant={editor.isActive("bulletList") ? "default" : "ghost"}
@@ -387,8 +385,8 @@ export function TiptapToolbar({
             </Button>
           </div>
 
-          {/* Font Size */}
-          <div className="flex items-center gap-1 sm:gap-2 border-r pr-1 sm:pr-2">
+          {/* Font Size (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-1 sm:gap-2 border-r pr-1 sm:pr-2">
             <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 hidden sm:block" />
             <select
               value={fontSize}
@@ -418,8 +416,8 @@ export function TiptapToolbar({
             </select>
           </div>
 
-          {/* Colors */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          {/* Colors (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-1 sm:gap-2">
             <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 hidden sm:block" />
             <div className="relative">
               <Button
@@ -489,7 +487,7 @@ export function TiptapToolbar({
           </div>
 
           {/* More Tools Button - Mobile Only */}
-          <div className="md:hidden relative ml-auto">
+          <div className="md:hidden relative basis-full flex justify-end mt-1">
             <Button
               size="sm"
               variant={showMoreTools ? "default" : "outline"}
@@ -766,18 +764,6 @@ export function TiptapToolbar({
             )}
           </div>
         </div>
-      </div>
-
-      {/* Scrollbar Hide CSS */}
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }

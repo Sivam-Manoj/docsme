@@ -4,6 +4,16 @@
   overflow-y: auto;
 }
 
+/* Hide scrollbar for toolbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .ProseMirror {
   outline: none !important;
   min-height: 297mm; /* Full A4 height */
