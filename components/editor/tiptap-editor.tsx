@@ -78,6 +78,52 @@ export function TiptapEditor({
         HTMLAttributes: {
           class: 'editor-image',
         },
+      }).extend({
+        addNodeView() {
+          return ({ node, editor, getPos }) => {
+            const container = document.createElement('div');
+            container.className = 'image-wrapper';
+            container.style.position = 'relative';
+            container.style.display = 'inline-block';
+            container.style.margin = '1rem auto';
+            
+            const img = document.createElement('img');
+            img.src = node.attrs.src;
+            img.alt = node.attrs.alt || '';
+            img.className = 'editor-image';
+            
+            // Add delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '×';
+            deleteBtn.className = 'image-delete-btn';
+            deleteBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;';
+            
+            container.addEventListener('mouseenter', () => {
+              deleteBtn.style.opacity = '1';
+            });
+            
+            container.addEventListener('mouseleave', () => {
+              deleteBtn.style.opacity = '0';
+            });
+            
+            deleteBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (typeof getPos === 'function') {
+                const pos = getPos();
+                if (pos !== undefined) {
+                  editor.commands.deleteRange({ from: pos, to: pos + node.nodeSize });
+                }
+              }
+            });
+            
+            container.appendChild(img);
+            container.appendChild(deleteBtn);
+            
+            return {
+              dom: container,
+            };
+          };
+        },
       }),
       Table.configure({
         resizable: true,

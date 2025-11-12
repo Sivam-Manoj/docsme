@@ -237,16 +237,33 @@
 }
 
 /* Images */
+.ProseMirror .image-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  margin: 1rem auto;
+  cursor: pointer;
+}
+
 .ProseMirror img {
   max-width: 100%;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: block;
-  margin: 1rem auto;
+  transition: transform 0.2s;
+}
+
+.ProseMirror .image-wrapper:hover img {
+  transform: scale(1.02);
 }
 
 .ProseMirror img.ProseMirror-selectednode {
   outline: 3px solid #667eea;
   outline-offset: 2px;
+}
+
+.ProseMirror .image-delete-btn:hover {
+  background: rgba(220, 38, 38, 1) !important;
+  transform: scale(1.1);
 }

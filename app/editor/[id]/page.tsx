@@ -16,6 +16,7 @@ import { TiptapToolbar } from "@/components/editor/tiptap-toolbar";
 import { EmailShareModal } from "@/components/editor/email-share-modal";
 import { ChartGenerator } from "@/components/editor/chart-generator";
 import { ImageUploader } from "@/components/editor/image-uploader";
+import { ContextMenu } from "@/components/editor/context-menu";
 
 interface DocumentData {
   _id: string;
@@ -583,6 +584,9 @@ export default function EditorPage({
           onClose={() => setShowImageModal(false)}
         />
       )}
+
+      {/* Custom Context Menu */}
+      <ContextMenu editor={editorInstance} />
     </div>
   );
 }

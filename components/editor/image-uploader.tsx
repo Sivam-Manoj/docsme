@@ -17,6 +17,8 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
   const [imageCaption, setImageCaption] = useState<string>("");
   const [imageWidth, setImageWidth] = useState<string>("100%");
   const [imageAlign, setImageAlign] = useState<"left" | "center" | "right">("center");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,20 +47,46 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
     reader.readAsDataURL(file);
   };
 
-  const handleInsert = () => {
+  const handleInsert = async () => {
     if (!selectedImage || !imagePreview) {
       toast.error("Please select an image");
       return;
     }
 
-    // Pass image data object instead of HTML
-    onInsert({
-      src: imagePreview,
-      alt: imageCaption || 'Image',
-      caption: imageCaption || undefined
-    });
-    
-    toast.success("Image inserted successfully!");
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      // Upload to R2 via API
+      const formData = new FormData();
+      formData.append("file", selectedImage);
+
+      const response = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
+      }
+
+      const data = await response.json();
+      setUploadProgress(100);
+
+      // Pass image URL instead of base64
+      onInsert({
+        src: data.url,
+        alt: imageCaption || selectedImage.name,
+        caption: imageCaption || undefined
+      });
+      
+      toast.success("Image uploaded successfully!");
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast.error(error.message || "Failed to upload image");
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -195,11 +223,20 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
           </Button>
           <Button
             onClick={handleInsert}
-            disabled={!selectedImage}
+            disabled={!selectedImage || isUploading}
             className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50"
           >
-            <ImageIcon className="w-4 h-4 mr-2" />
-            Insert Image
+            {isUploading ? (
+              <>
+                <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <ImageIcon className="w-4 h-4 mr-2" />
+                Insert Image
+              </>
+            )}
           </Button>
         </div>
       </div>
