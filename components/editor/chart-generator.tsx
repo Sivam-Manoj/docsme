@@ -39,126 +39,109 @@ export function ChartGenerator({ onInsert, onClose }: ChartGeneratorProps) {
 
   const generateBarChart = (data: { label: string; value: number }[]) => {
     const maxValue = Math.max(...data.map(d => d.value));
+    
+    // Generate as table for better Tiptap compatibility
     const rows = data.map(d => {
       const percentage = (d.value / maxValue) * 100;
-      return `
-        <div style="margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-            <span style="font-size: 13px; font-weight: 600; color: #374151;">${d.label}</span>
-            <span style="font-size: 13px; font-weight: 700; color: #8b5cf6;">${d.value}</span>
-          </div>
-          <div style="width: 100%; height: 24px; background: #f3f4f6; border-radius: 6px; overflow: hidden;">
-            <div style="height: 100%; width: ${percentage}%; background: linear-gradient(90deg, #8b5cf6, #a78bfa); transition: width 0.3s;"></div>
-          </div>
-        </div>
-      `;
+      const barWidth = Math.round(percentage);
+      const emptyWidth = 100 - barWidth;
+      return `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>${d.label}</strong></td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;"><strong style="color: #8b5cf6;">${d.value}</strong></td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; width: 200px;">
+          <span style="display: inline-block; height: 20px; background: linear-gradient(90deg, #8b5cf6, #a78bfa); width: ${barWidth}%;"></span>
+        </td>
+      </tr>`;
     }).join("");
     
-    return `
-      <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
-        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">${chartTitle || "Bar Chart"}</h3>
-        ${rows}
-      </div>
-    `;
+    return `<blockquote style="border-left: 4px solid #8b5cf6; padding-left: 16px; margin: 20px 0;">
+<p><strong style="font-size: 18px; color: #111827;">${chartTitle || "Bar Chart"}</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+  <thead>
+    <tr style="background: #f9fafb;">
+      <th style="padding: 8px; text-align: left; border-bottom: 2px solid #8b5cf6;">Label</th>
+      <th style="padding: 8px; text-align: right; border-bottom: 2px solid #8b5cf6;">Value</th>
+      <th style="padding: 8px; border-bottom: 2px solid #8b5cf6;">Chart</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+</blockquote>`;
   };
 
   const generateLineChart = (data: { label: string; value: number }[]) => {
-    const maxValue = Math.max(...data.map(d => d.value));
-    const points = data.map((d, i) => {
-      const x = (i / (data.length - 1)) * 100;
-      const y = 100 - ((d.value / maxValue) * 80);
-      return `${x},${y}`;
-    }).join(" ");
+    const rows = data.map((d, i) => 
+      `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;"><strong>${d.label}</strong></td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;"><strong style="color: #10b981;">${d.value}</strong></td>
+      </tr>`
+    ).join("");
     
-    return `
-      <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
-        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #10b981; padding-bottom: 8px;">${chartTitle || "Line Chart"}</h3>
-        <svg viewBox="0 0 100 100" style="width: 100%; height: 200px; background: #f9fafb; border-radius: 8px; padding: 10px;">
-          <polyline points="${points}" fill="none" stroke="#10b981" stroke-width="2" />
-          ${data.map((d, i) => {
-            const x = (i / (data.length - 1)) * 100;
-            const y = 100 - ((d.value / maxValue) * 80);
-            return `<circle cx="${x}" cy="${y}" r="3" fill="#059669" />`;
-          }).join("")}
-        </svg>
-        <div style="display: flex; justify-content: space-around; margin-top: 12px;">
-          ${data.map(d => `<span style="font-size: 11px; color: #6b7280;">${d.label}</span>`).join("")}
-        </div>
-      </div>
-    `;
+    return `<blockquote style="border-left: 4px solid #10b981; padding-left: 16px; margin: 20px 0;">
+<p><strong style="font-size: 18px; color: #111827;">${chartTitle || "Line Chart / Data"}</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+  <thead>
+    <tr style="background: #f0fdf4;">
+      <th style="padding: 8px; text-align: left; border-bottom: 2px solid #10b981;">Label</th>
+      <th style="padding: 8px; text-align: right; border-bottom: 2px solid #10b981;">Value</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+</blockquote>`;
   };
 
   const generatePieChart = (data: { label: string; value: number }[]) => {
     const total = data.reduce((sum, d) => sum + d.value, 0);
-    let currentAngle = 0;
-    
     const colors = ["#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#3b82f6", "#ef4444"];
     
-    const slices = data.map((d, i) => {
-      const percentage = (d.value / total) * 100;
-      const angle = (d.value / total) * 360;
-      const startAngle = currentAngle;
-      currentAngle += angle;
-      
-      const x1 = 50 + 40 * Math.cos((startAngle - 90) * Math.PI / 180);
-      const y1 = 50 + 40 * Math.sin((startAngle - 90) * Math.PI / 180);
-      const x2 = 50 + 40 * Math.cos((currentAngle - 90) * Math.PI / 180);
-      const y2 = 50 + 40 * Math.sin((currentAngle - 90) * Math.PI / 180);
-      const largeArc = angle > 180 ? 1 : 0;
-      
-      return {
-        path: `M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`,
-        color: colors[i % colors.length],
-        label: d.label,
-        value: d.value,
-        percentage: percentage.toFixed(1)
-      };
-    });
+    const rows = data.map((d, i) => {
+      const percentage = ((d.value / total) * 100).toFixed(1);
+      return `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">
+          <span style="display: inline-block; width: 12px; height: 12px; background: ${colors[i % colors.length]}; border-radius: 3px; margin-right: 8px;"></span>
+          <strong>${d.label}</strong>
+        </td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;"><strong style="color: ${colors[i % colors.length]};">${d.value}</strong></td>
+        <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;"><em>${percentage}%</em></td>
+      </tr>`;
+    }).join("");
     
-    return `
-      <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
-        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #ec4899; padding-bottom: 8px;">${chartTitle || "Pie Chart"}</h3>
-        <div style="display: flex; align-items: center; gap: 20px;">
-          <svg viewBox="0 0 100 100" style="width: 200px; height: 200px;">
-            ${slices.map(s => `<path d="${s.path}" fill="${s.color}" />`).join("")}
-          </svg>
-          <div style="flex: 1;">
-            ${slices.map(s => `
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                <div style="width: 16px; height: 16px; background: ${s.color}; border-radius: 4px;"></div>
-                <span style="font-size: 13px; color: #374151;">${s.label}: <strong>${s.value}</strong> (${s.percentage}%)</span>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      </div>
-    `;
+    return `<blockquote style="border-left: 4px solid #ec4899; padding-left: 16px; margin: 20px 0;">
+<p><strong style="font-size: 18px; color: #111827;">${chartTitle || "Pie Chart / Distribution"}</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+  <thead>
+    <tr style="background: #fdf2f8;">
+      <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ec4899;">Category</th>
+      <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ec4899;">Value</th>
+      <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ec4899;">Percentage</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+</blockquote>`;
   };
 
   const generateTable = (data: { label: string; value: number }[]) => {
-    const rows = data.map((d, i) => `
-      <tr style="border-bottom: 1px solid #e5e7eb; ${i % 2 === 0 ? 'background: #f9fafb;' : ''}">
-        <td style="padding: 12px; font-size: 13px; color: #374151;">${d.label}</td>
-        <td style="padding: 12px; font-size: 13px; font-weight: 700; color: #8b5cf6; text-align: right;">${d.value}</td>
-      </tr>
-    `).join("");
+    const rows = data.map((d, i) => 
+      `<tr style="${i % 2 === 0 ? 'background: #f9fafb;' : ''}">
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${d.label}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: right;"><strong style="color: #3b82f6;">${d.value}</strong></td>
+      </tr>`
+    ).join("");
     
-    return `
-      <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px; overflow-x: auto;">
-        <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #3b82f6; padding-bottom: 8px;">${chartTitle || "Data Table"}</h3>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #f3f4f6; border-bottom: 2px solid #d1d5db;">
-              <th style="padding: 12px; text-align: left; font-size: 13px; font-weight: 700; color: #111827;">Category</th>
-              <th style="padding: 12px; text-align: right; font-size: 13px; font-weight: 700; color: #111827;">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      </div>
-    `;
+    return `<blockquote style="border-left: 4px solid #3b82f6; padding-left: 16px; margin: 20px 0;">
+<p><strong style="font-size: 18px; color: #111827;">${chartTitle || "Data Table"}</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+  <thead>
+    <tr style="background: #eff6ff;">
+      <th style="padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #3b82f6;">Category</th>
+      <th style="padding: 12px; text-align: right; font-weight: 700; border-bottom: 2px solid #3b82f6;">Value</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+</blockquote>`;
   };
 
   const handleInsert = () => {

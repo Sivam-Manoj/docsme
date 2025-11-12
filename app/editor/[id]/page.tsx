@@ -201,14 +201,39 @@ export default function EditorPage({
   const handleInsertChart = (chartHtml: string) => {
     if (!editorInstance) return;
     
-    editorInstance.chain().focus().insertContent(chartHtml).run();
+    // Insert HTML content with parseOptions to ensure it's rendered as HTML
+    editorInstance
+      .chain()
+      .focus()
+      .insertContent(chartHtml, {
+        parseOptions: {
+          preserveWhitespace: 'full',
+        },
+      })
+      .run();
     setShowChartModal(false);
   };
 
-  const handleInsertImage = (imageHtml: string) => {
+  const handleInsertImage = (imageData: { src: string; alt: string; caption?: string }) => {
     if (!editorInstance) return;
     
-    editorInstance.chain().focus().insertContent(imageHtml).run();
+    // Insert image as a proper node using insertContent
+    // Remove inline styles - let CSS handle styling
+    editorInstance
+      .chain()
+      .focus()
+      .insertContent(`<img src="${imageData.src}" alt="${imageData.alt}" />`)
+      .enter()
+      .run();
+    
+    // If there's a caption, add it as italic text
+    if (imageData.caption) {
+      editorInstance
+        .chain()
+        .insertContent(`<p><em>${imageData.caption}</em></p>`)
+        .run();
+    }
+    
     setShowImageModal(false);
   };
 

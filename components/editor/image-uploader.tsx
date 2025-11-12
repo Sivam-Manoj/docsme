@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 interface ImageUploaderProps {
-  onInsert: (imageHtml: string) => void;
+  onInsert: (imageData: { src: string; alt: string; caption?: string }) => void;
   onClose: () => void;
 }
 
@@ -51,18 +51,13 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
       return;
     }
 
-    const alignStyle = imageAlign === "center" ? "margin: 0 auto;" : imageAlign === "right" ? "margin-left: auto;" : "";
+    // Pass image data object instead of HTML
+    onInsert({
+      src: imagePreview,
+      alt: imageCaption || 'Image',
+      caption: imageCaption || undefined
+    });
     
-    const imageHtml = `
-      <div style="margin: 20px 0; text-align: ${imageAlign};">
-        <div style="display: inline-block; max-width: ${imageWidth}; ${alignStyle}">
-          <img src="${imagePreview}" alt="${imageCaption || 'Image'}" style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-          ${imageCaption ? `<p style="margin-top: 8px; font-size: 13px; color: #6b7280; font-style: italic; text-align: center;">${imageCaption}</p>` : ""}
-        </div>
-      </div>
-    `;
-
-    onInsert(imageHtml);
     toast.success("Image inserted successfully!");
   };
 
@@ -93,7 +88,7 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
               className="hidden"
             />
             
-            {!selectedImage ? (
+            {!selectedImage || !imagePreview ? (
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="w-full px-6 py-8 border-2 border-dashed border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center gap-3"
@@ -112,6 +107,7 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
                   width={600}
                   height={400}
                   className="w-full h-auto"
+                  unoptimized
                 />
                 <button
                   onClick={() => {
