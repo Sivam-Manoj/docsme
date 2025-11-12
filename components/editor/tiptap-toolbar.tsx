@@ -30,6 +30,8 @@ import {
   Code2,
   MoreHorizontal,
   X,
+  BarChart3,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -43,6 +45,8 @@ interface TiptapToolbarProps {
   onFontFamilyChange: (family: string) => void;
   onTextColorChange: (color: string) => void;
   onBackgroundColorChange: (color: string) => void;
+  onInsertChart?: () => void;
+  onInsertImage?: () => void;
 }
 
 export function TiptapToolbar({
@@ -55,6 +59,8 @@ export function TiptapToolbar({
   onFontFamilyChange,
   onTextColorChange,
   onBackgroundColorChange,
+  onInsertChart,
+  onInsertImage,
 }: TiptapToolbarProps) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
@@ -359,6 +365,28 @@ export function TiptapToolbar({
             </Button>
           </div>
 
+          {/* Chart & Image - Hidden on mobile */}
+          <div className="hidden md:flex items-center gap-1 border-r pr-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onInsertChart}
+              title="Insert Chart/Graph"
+              className="h-8 w-8 p-0"
+            >
+              <BarChart3 className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onInsertImage}
+              title="Insert Image"
+              className="h-8 w-8 p-0"
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
+          </div>
+
           {/* Font Size */}
           <div className="flex items-center gap-1 sm:gap-2 border-r pr-1 sm:pr-2">
             <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 hidden sm:block" />
@@ -630,6 +658,37 @@ export function TiptapToolbar({
                         >
                           <TableIcon className="w-5 h-5" />
                           <span className="text-[10px]">Table</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Chart & Image */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 mb-2">MEDIA</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            onInsertChart?.();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <BarChart3 className="w-5 h-5" />
+                          <span className="text-[10px]">Chart</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            onInsertImage?.();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <ImageIcon className="w-5 h-5" />
+                          <span className="text-[10px]">Image</span>
                         </Button>
                       </div>
                     </div>

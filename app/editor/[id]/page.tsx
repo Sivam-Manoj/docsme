@@ -14,6 +14,8 @@ import { SharePanel } from "@/components/editor/share-panel";
 import { TiptapEditor } from "@/components/editor/tiptap-editor";
 import { TiptapToolbar } from "@/components/editor/tiptap-toolbar";
 import { EmailShareModal } from "@/components/editor/email-share-modal";
+import { ChartGenerator } from "@/components/editor/chart-generator";
+import { ImageUploader } from "@/components/editor/image-uploader";
 
 interface DocumentData {
   _id: string;
@@ -44,6 +46,8 @@ export default function EditorPage({
   const [selectedText, setSelectedText] = useState("");
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showChartModal, setShowChartModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
   );
@@ -192,6 +196,20 @@ export default function EditorPage({
     } finally {
       setIsRewriting(false);
     }
+  };
+
+  const handleInsertChart = (chartHtml: string) => {
+    if (!editorInstance) return;
+    
+    editorInstance.chain().focus().insertContent(chartHtml).run();
+    setShowChartModal(false);
+  };
+
+  const handleInsertImage = (imageHtml: string) => {
+    if (!editorInstance) return;
+    
+    editorInstance.chain().focus().insertContent(imageHtml).run();
+    setShowImageModal(false);
   };
 
   const handleShare = async (password?: string) => {
@@ -465,6 +483,8 @@ export default function EditorPage({
                       styling: { ...document.styling, textColor: color },
                     })
                   }
+                  onInsertChart={() => setShowChartModal(true)}
+                  onInsertImage={() => setShowImageModal(true)}
                   onBackgroundColorChange={(color) =>
                     setDocument({
                       ...document,
@@ -522,6 +542,22 @@ export default function EditorPage({
         documentId={resolvedParams?.id || ""}
         documentTitle={document.title}
       />
+
+      {/* Chart Generator Modal */}
+      {showChartModal && (
+        <ChartGenerator
+          onInsert={handleInsertChart}
+          onClose={() => setShowChartModal(false)}
+        />
+      )}
+
+      {/* Image Uploader Modal */}
+      {showImageModal && (
+        <ImageUploader
+          onInsert={handleInsertImage}
+          onClose={() => setShowImageModal(false)}
+        />
+      )}
     </div>
   );
 }

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const textToRewrite = selectedText || content;
 
-    const systemPrompt = `You are a professional document editor. Rewrite the provided text according to the user's instructions while maintaining the overall structure and meaning. 
+    const systemPrompt = `You are a professional document editor with expertise in creating visually rich, data-driven content. Rewrite the provided text according to the user's instructions while maintaining the overall structure and meaning. 
 
 IMPORTANT: Return the content in Markdown format that supports:
 - Headings: # Heading 1, ## Heading 2, ### Heading 3
@@ -38,7 +38,27 @@ IMPORTANT: Return the content in Markdown format that supports:
 - Tables: | Header | Header |
 - Task lists: - [ ] task or - [x] done
 
-Return ONLY Markdown. No HTML tags. No explanations.`;
+**VISUAL ENHANCEMENTS:**
+- If the content contains business data, statistics, or comparisons, INCLUDE styled HTML charts/graphs using inline CSS
+- Use modern HTML/CSS with gradients, shadows, and visual styling
+- Create bar charts, progress indicators, or styled data tables when appropriate
+- Use violet/purple/pink color schemes for professional look
+
+**Example chart format (use when data is present):**
+<div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
+  <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px;">Chart Title</h3>
+  <div style="margin-bottom: 12px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+      <span style="font-size: 13px; font-weight: 600;">Label</span>
+      <span style="font-size: 13px; font-weight: 700; color: #8b5cf6;">Value</span>
+    </div>
+    <div style="width: 100%; height: 24px; background: #f3f4f6; border-radius: 6px;">
+      <div style="height: 100%; width: 80%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
+    </div>
+  </div>
+</div>
+
+Return Markdown with embedded HTML for visual elements when appropriate. No additional explanations.`;
 
     const userPrompt = instruction
       ? `Instruction: ${instruction}\n\nText to rewrite (return as Markdown):\n${textToRewrite}`

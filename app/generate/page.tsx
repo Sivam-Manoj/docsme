@@ -18,10 +18,15 @@ import {
   CheckCircle2,
   StopCircle,
   ScrollText,
+  Upload,
+  Image as ImageIcon,
+  File,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { VoiceRecorder } from "@/components/dashboard/voice-recorder";
 import { TiptapEditor } from "@/components/editor/tiptap-editor";
+import { FileUploader } from "@/components/generate/file-uploader";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
@@ -55,6 +60,11 @@ export default function GeneratePage() {
   const [autoScroll, setAutoScroll] = useState(true);
   const streamingViewRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // File upload state
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [uploadedPDF, setUploadedPDF] = useState<File | null>(null);
+  const [isUploadingFiles, setIsUploadingFiles] = useState(false);
 
   // Load pending prompt from try-now modal
   useEffect(() => {
@@ -84,12 +94,32 @@ export default function GeneratePage() {
     { id: "general", label: "General", icon: FileText, desc: "Standard" },
   ];
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   const buildPromptFromAnswers = () => {
     const questions = dynamicQuestions;
     const docTypeLabel = docTypes.find((t) => t.id === docType)?.label;
 
     let fullPrompt = `Original Request: ${prompt}\n\n`;
     fullPrompt += `Document Type: ${docTypeLabel}\n\n`;
+    
+    // Add file context
+    if (uploadedPDF) {
+      fullPrompt += `Attached Files: 1 PDF document (${uploadedPDF.name})\n`;
+      fullPrompt += "Please analyze the PDF content and incorporate relevant information into the document.\n\n";
+    }
+    if (uploadedImages.length > 0) {
+      fullPrompt += `Attached Images: ${uploadedImages.length} image(s)\n`;
+      fullPrompt += "Please analyze the images and incorporate relevant visual information into the document.\n\n";
+    }
+    
     fullPrompt += `Additional Details from Questions:\n\n`;
 
     questions.forEach((q) => {
@@ -178,6 +208,26 @@ export default function GeneratePage() {
     abortControllerRef.current = new AbortController();
 
     try {
+      // Convert files to base64
+      setIsUploadingFiles(true);
+      const imageFiles = await Promise.all(
+        uploadedImages.map(async (file) => ({
+          filename: file.name,
+          type: file.type,
+          data: await fileToBase64(file),
+        }))
+      );
+      
+      let pdfFile = null;
+      if (uploadedPDF) {
+        pdfFile = {
+          filename: uploadedPDF.name,
+          type: uploadedPDF.type,
+          data: await fileToBase64(uploadedPDF),
+        };
+      }
+      setIsUploadingFiles(false);
+
       const response = await fetch("/api/documents/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -186,6 +236,8 @@ export default function GeneratePage() {
           documentType: docType,
           effort: effort || "medium",
           verbosity: verbosity || "medium",
+          images: imageFiles,
+          pdf: pdfFile,
         }),
         signal: abortControllerRef.current.signal,
       });
@@ -495,6 +547,18 @@ export default function GeneratePage() {
                     <label className="text-sm font-bold text-gray-900 mb-2 block">
                       Your Idea
                     </label>
+                    
+                    {/* File Uploader - Above prompt */}
+                    <div className="mb-2">
+                      <FileUploader
+                        uploadedImages={uploadedImages}
+                        uploadedPDF={uploadedPDF}
+                        onImagesChange={setUploadedImages}
+                        onPDFChange={setUploadedPDF}
+                        disabled={isGeneratingQuestions}
+                      />
+                    </div>
+                    
                     <div className="flex gap-2">
                       <textarea
                         placeholder="Describe what you want to create..."

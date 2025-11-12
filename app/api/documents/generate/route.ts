@@ -23,6 +23,8 @@ export async function POST(req: NextRequest) {
       documentType,
       effort = "medium",
       verbosity = "medium",
+      images = [],
+      pdf = null,
     } = await req.json();
 
     if (!prompt) {
@@ -61,12 +63,42 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate document content with OpenAI (Streaming)
-    const systemPrompt = `You are a professional document writer. Generate a well-structured, professional document based on the user's prompt. 
+    const systemPrompt = `You are a professional document writer with expertise in creating visually rich, data-driven documents. Generate a well-structured, professional document based on the user's prompt. 
+    
     Format the document with proper HTML formatting for structure.
-    Make it comprehensive and ready to use for ${
-      documentType || "general purpose"
-    }.
-    Use proper HTML tags like <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em> for formatting.`;
+    Make it comprehensive and ready to use for ${documentType || "general purpose"}.
+    
+    **IMPORTANT STYLING GUIDELINES:**
+    - Use proper HTML tags like <h1>, <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em> for formatting.
+    - When the document includes business data, statistics, or numerical comparisons, CREATE VISUAL CHARTS AND GRAPHS using inline HTML/CSS.
+    - For charts, use styled HTML divs with gradients, bars, and visual elements (NOT canvas or external libraries).
+    - Create beautiful bar charts, progress bars, or data tables with proper styling.
+    - Use modern CSS with gradients (linear-gradient), shadows, borders, and colors.
+    - Make charts visually appealing with violet/purple/pink color schemes.
+    
+    **CHART FORMAT EXAMPLES:**
+    For data visualization, create charts like this:
+    <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px; border-bottom: 2px solid #8b5cf6; padding-bottom: 8px;">Chart Title</h3>
+      <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span style="font-size: 13px; font-weight: 600; color: #374151;">Label</span>
+          <span style="font-size: 13px; font-weight: 700; color: #8b5cf6;">Value</span>
+        </div>
+        <div style="width: 100%; height: 24px; background: #f3f4f6; border-radius: 6px; overflow: hidden;">
+          <div style="height: 100%; width: 75%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
+        </div>
+      </div>
+    </div>
+    
+    **WHEN TO USE CHARTS:**
+    - Business reports with KPIs or metrics
+    - Financial data or revenue comparisons
+    - Survey results or statistics
+    - Performance comparisons
+    - Any quantitative data that benefits from visualization
+    
+    Make the document visually engaging, professional, and data-driven when appropriate.`;
 
     const isDev = process.env.NODE_ENV === "development";
 
@@ -81,11 +113,52 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Build input array with text and files
+    const inputContent: any[] = [
+      {
+        type: "input_text",
+        text: prompt,
+      },
+    ];
+
+    // Add PDF file if provided
+    if (pdf && pdf.data) {
+      inputContent.push({
+        type: "input_file",
+        filename: pdf.filename,
+        file_data: pdf.data,
+      });
+      
+      if (isDev) {
+        console.log("📄 PDF attached:", pdf.filename);
+      }
+    }
+
+    // Add image files if provided
+    if (images && images.length > 0) {
+      images.forEach((img: any) => {
+        inputContent.push({
+          type: "input_file",
+          filename: img.filename,
+          file_data: img.data,
+        });
+      });
+      
+      if (isDev) {
+        console.log(`🖼️ ${images.length} image(s) attached`);
+      }
+    }
+
     let stream;
     try {
       stream = await openai.responses.stream({
         model: "gpt-5",
-        input: prompt,
+        input: [
+          {
+            role: "user",
+            content: inputContent,
+          },
+        ],
         instructions: systemPrompt,
         reasoning: {
           effort: effort as "minimal" | "low" | "medium" | "high",
