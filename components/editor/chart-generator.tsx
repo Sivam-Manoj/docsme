@@ -189,6 +189,14 @@ export function ChartGenerator({ onInsert, onClose }: ChartGeneratorProps) {
 
         {/* Content */}
         <div className="p-6 space-y-6">
+          {/* Info Banner */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> Charts are rendered as formatted tables and blockquotes for better compatibility. 
+              For complex visualizations, consider using markdown tables in your content.
+            </p>
+          </div>
+
           {/* Chart Type */}
           <div>
             <label className="text-sm font-bold text-gray-900 mb-3 block">Chart Type</label>

@@ -39,29 +39,26 @@ IMPORTANT: Return the content in Markdown format that supports:
 - Task lists: - [ ] task or - [x] done
 
 **VISUAL ENHANCEMENTS:**
-- If the content contains business data, statistics, or comparisons, INCLUDE styled HTML charts/graphs using inline CSS
-- Use modern HTML/CSS with gradients, shadows, and visual styling
-- Create bar charts, progress indicators, or styled data tables when appropriate
-- Use violet/purple/pink color schemes for professional look
+- **DO NOT use inline HTML/CSS for charts or graphs** - they are not supported
+- For business data, statistics, or comparisons, use **markdown tables** instead
+- Keep formatting simple and clean
+- Focus on content clarity over visual complexity
 
 **TASK LISTS:**
 - For action items, checklists, or to-dos, use interactive task lists
 - Format: <ul data-type="taskList"><li data-type="taskItem" data-checked="true/false">Task description</li></ul>
 - Users can check/uncheck tasks for collaboration
 
-**Example chart format (use when data is present):**
-<div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
-  <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px;">Chart Title</h3>
-  <div style="margin-bottom: 12px;">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-      <span style="font-size: 13px; font-weight: 600;">Label</span>
-      <span style="font-size: 13px; font-weight: 700; color: #8b5cf6;">Value</span>
-    </div>
-    <div style="width: 100%; height: 24px; background: #f3f4f6; border-radius: 6px;">
-      <div style="height: 100%; width: 80%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
-    </div>
-  </div>
-</div>
+**DATA PRESENTATION:**
+Use clean markdown tables for data:
+| Metric | Value | Change |
+|--------|-------|--------|
+| Revenue | $234K | +12% |
+| Profit | $124K | +8% |
+
+Or bullet lists with key metrics:
+- **Revenue**: $234,502 (+12%)
+- **Profit**: $124,179 (+8%)
 
 Return Markdown with embedded HTML for visual elements when appropriate. No additional explanations.`;
 
