@@ -549,6 +549,10 @@ export default function EditorPage({
                   onChange={(html) => setDocument({ ...document, content: html })}
                   onSelectionChange={setSelectedText}
                   onEditorReady={setEditorInstance}
+                  onRewriteClick={(selectedText) => {
+                    setSelectedText(selectedText);
+                    setShowAIPanel(true);
+                  }}
                   fontSize={document.styling.fontSize}
                   fontFamily={document.styling.fontFamily}
                   textColor={document.styling.textColor}

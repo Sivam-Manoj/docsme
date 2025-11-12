@@ -1,6 +1,7 @@
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
@@ -22,6 +23,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
 import { useEffect } from "react";
+import { Sparkles } from "lucide-react";
 import "./tiptap-styles.css";
 
 const lowlight = createLowlight(common);
@@ -31,6 +33,7 @@ interface TiptapEditorProps {
   onChange: (content: string) => void;
   onSelectionChange?: (text: string) => void;
   onEditorReady?: (editor: any) => void;
+  onRewriteClick?: (selectedText: string) => void;
   fontSize?: number;
   fontFamily?: string;
   textColor?: string;
@@ -44,6 +47,7 @@ export function TiptapEditor({
   onChange,
   onSelectionChange,
   onEditorReady,
+  onRewriteClick,
   fontSize = 16,
   fontFamily = "Arial",
   textColor = "#000000",
@@ -58,12 +62,12 @@ export function TiptapEditor({
       StarterKit.configure({
         bulletList: {
           HTMLAttributes: {
-            class: 'list-disc pl-6',
+            class: "list-disc pl-6",
           },
         },
         orderedList: {
           HTMLAttributes: {
-            class: 'list-decimal pl-6',
+            class: "list-decimal pl-6",
           },
         },
         codeBlock: false, // Disable default code block to use CodeBlockLowlight
@@ -76,49 +80,53 @@ export function TiptapEditor({
         inline: false,
         allowBase64: true,
         HTMLAttributes: {
-          class: 'editor-image',
+          class: "editor-image",
         },
       }).extend({
         addNodeView() {
           return ({ node, editor, getPos }) => {
-            const container = document.createElement('div');
-            container.className = 'image-wrapper';
-            container.style.position = 'relative';
-            container.style.display = 'inline-block';
-            container.style.margin = '1rem auto';
-            
-            const img = document.createElement('img');
+            const container = document.createElement("div");
+            container.className = "image-wrapper";
+            container.style.position = "relative";
+            container.style.display = "inline-block";
+            container.style.margin = "1rem auto";
+
+            const img = document.createElement("img");
             img.src = node.attrs.src;
-            img.alt = node.attrs.alt || '';
-            img.className = 'editor-image';
-            
+            img.alt = node.attrs.alt || "";
+            img.className = "editor-image";
+
             // Add delete button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.innerHTML = '×';
-            deleteBtn.className = 'image-delete-btn';
-            deleteBtn.style.cssText = 'position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;';
-            
-            container.addEventListener('mouseenter', () => {
-              deleteBtn.style.opacity = '1';
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerHTML = "×";
+            deleteBtn.className = "image-delete-btn";
+            deleteBtn.style.cssText =
+              "position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;";
+
+            container.addEventListener("mouseenter", () => {
+              deleteBtn.style.opacity = "1";
             });
-            
-            container.addEventListener('mouseleave', () => {
-              deleteBtn.style.opacity = '0';
+
+            container.addEventListener("mouseleave", () => {
+              deleteBtn.style.opacity = "0";
             });
-            
-            deleteBtn.addEventListener('click', (e) => {
+
+            deleteBtn.addEventListener("click", (e) => {
               e.stopPropagation();
-              if (typeof getPos === 'function') {
+              if (typeof getPos === "function") {
                 const pos = getPos();
                 if (pos !== undefined) {
-                  editor.commands.deleteRange({ from: pos, to: pos + node.nodeSize });
+                  editor.commands.deleteRange({
+                    from: pos,
+                    to: pos + node.nodeSize,
+                  });
                 }
               }
             });
-            
+
             container.appendChild(img);
             container.appendChild(deleteBtn);
-            
+
             return {
               dom: container,
             };
@@ -139,7 +147,7 @@ export function TiptapEditor({
       TaskItem.configure({
         nested: true,
         HTMLAttributes: {
-          class: 'task-item',
+          class: "task-item",
         },
       }),
       Highlight.configure({
@@ -148,7 +156,7 @@ export function TiptapEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer',
+          class: "text-blue-600 underline hover:text-blue-800 cursor-pointer",
         },
       }),
       Subscript,
@@ -156,7 +164,8 @@ export function TiptapEditor({
       CodeBlockLowlight.configure({
         lowlight,
         HTMLAttributes: {
-          class: 'bg-gray-900 text-gray-100 rounded-lg p-4 font-mono text-sm overflow-x-auto',
+          class:
+            "bg-gray-900 text-gray-100 rounded-lg p-4 font-mono text-sm overflow-x-auto",
         },
       }),
       Markdown.configure({
@@ -168,7 +177,8 @@ export function TiptapEditor({
     content: content,
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none",
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none",
         style: `font-size: ${fontSize}px; font-family: ${fontFamily}; color: ${textColor};`,
       },
     },
@@ -214,6 +224,15 @@ export function TiptapEditor({
     return <div className="p-4 text-gray-400">Loading editor...</div>;
   }
 
+  // Handle rewrite click
+  const handleRewriteClick = () => {
+    const { from, to } = editor.state.selection;
+    const selectedText = editor.state.doc.textBetween(from, to, " ");
+    if (selectedText.trim() && onRewriteClick) {
+      onRewriteClick(selectedText);
+    }
+  };
+
   if (variant === "viewer") {
     return (
       <div className="tiptap-editor-wrapper bg-white p-2 sm:p-4 overflow-y-auto">
@@ -221,26 +240,45 @@ export function TiptapEditor({
       </div>
     );
   }
+
   return (
-    <div className="tiptap-editor-wrapper h-full overflow-y-auto bg-gray-100 p-1 sm:p-4">
-      <div 
-        className="mx-auto shadow-lg w-full sm:max-w-[210mm]" 
-        style={{
-          minHeight: '297mm',
-          padding: '1rem',
-          boxSizing: 'border-box',
-          backgroundColor: backgroundColor
-        }}
-      >
-        <style jsx>{`
-          @media (min-width: 640px) {
-            div {
-              padding: 25mm 20mm !important;
+    <>
+      {/* Bubble Menu for text selection */}
+      {editable && editor && (
+        <BubbleMenu
+          editor={editor}
+          className="bg-white rounded-lg shadow-lg border border-gray-200 px-2 py-1 flex items-center gap-1 z-50"
+        >
+          <button
+            onClick={handleRewriteClick}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-violet-600 hover:bg-violet-50 rounded-md transition-colors"
+            title="Rewrite with AI"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Rewrite with AI</span>
+          </button>
+        </BubbleMenu>
+      )}
+      <div className="tiptap-editor-wrapper h-full overflow-y-auto bg-gray-100 p-1 sm:p-4">
+        <div
+          className="mx-auto shadow-lg w-full sm:max-w-[210mm]"
+          style={{
+            minHeight: "297mm",
+            padding: "1rem",
+            boxSizing: "border-box",
+            backgroundColor: backgroundColor,
+          }}
+        >
+          <style jsx>{`
+            @media (min-width: 640px) {
+              div {
+                padding: 25mm 20mm !important;
+              }
             }
-          }
-        `}</style>
-        <EditorContent editor={editor} />
+          `}</style>
+          <EditorContent editor={editor} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
