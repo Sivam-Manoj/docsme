@@ -317,6 +317,25 @@ export default function EditorPage({
             elem.style.border = 'none';
             elem.style.outline = 'none';
             elem.style.boxShadow = 'none';
+            
+            // Remove borders from ProseMirror editor
+            const prosemirror = elem.querySelector('.ProseMirror');
+            if (prosemirror) {
+              (prosemirror as HTMLElement).style.border = 'none';
+              (prosemirror as HTMLElement).style.outline = 'none';
+            }
+            
+            // Remove borders from all children
+            const allChildren = elem.querySelectorAll('*');
+            allChildren.forEach((child) => {
+              const el = child as HTMLElement;
+              if (el.style.border && el.style.border.includes('2px')) {
+                el.style.border = 'none';
+              }
+              if (el.style.outline) {
+                el.style.outline = 'none';
+              }
+            });
           }
         },
       });
@@ -480,7 +499,7 @@ export default function EditorPage({
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden relative">
-        <div className="grid lg:grid-cols-[1fr_360px] gap-4 p-2 sm:p-3 lg:p-4">
+        <div className={`${showAIPanel ? 'lg:grid lg:grid-cols-[1fr_360px]' : ''} gap-4 p-2 sm:p-3 lg:p-4 max-w-[1400px] mx-auto`}>
           {/* Editor Canvas */}
           <div className="bg-white rounded-lg shadow-sm flex flex-col">
             {/* Sticky Tiptap Formatting Toolbar */}

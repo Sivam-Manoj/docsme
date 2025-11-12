@@ -512,27 +512,28 @@ export function TiptapToolbar({
             {showMoreTools && (
               <>
                 <div 
-                  className="fixed inset-0 z-40 bg-black/20" 
+                  className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" 
                   onClick={() => setShowMoreTools(false)}
                 />
-                <div className="fixed inset-x-4 top-20 z-50 bg-white rounded-2xl shadow-2xl border-2 border-violet-200 max-h-[70vh] overflow-y-auto">
+                <div className="fixed inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-[90vw] sm:max-w-md top-16 z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 max-h-[75vh] overflow-y-auto">
                   {/* Header */}
-                  <div className="sticky top-0 bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-3 flex items-center justify-between rounded-t-2xl">
-                    <h3 className="font-bold text-sm">More Formatting Tools</h3>
+                  <div className="sticky top-0 bg-linear-to-r from-violet-600 to-purple-600 text-white px-4 py-3 flex items-center justify-between rounded-t-2xl z-10">
+                    <h3 className="font-bold text-sm sm:text-base">More Tools</h3>
                     <button
                       onClick={() => setShowMoreTools(false)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/20 transition"
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition"
+                      aria-label="Close"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
 
                   {/* Tools Grid */}
-                  <div className="p-4 space-y-4">
+                  <div className="p-3 sm:p-4 space-y-4 sm:space-y-5">
                     {/* Text Formatting */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">TEXT FORMATTING</p>
-                      <div className="grid grid-cols-4 gap-2">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Text Formatting</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <Button
                           size="sm"
                           variant={editor.isActive("strike") ? "default" : "outline"}
@@ -586,8 +587,8 @@ export function TiptapToolbar({
 
                     {/* Block Elements */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">BLOCKS</p>
-                      <div className="grid grid-cols-3 gap-2">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Blocks</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         <Button
                           size="sm"
                           variant={editor.isActive("heading", { level: 3 }) ? "default" : "outline"}
@@ -629,8 +630,8 @@ export function TiptapToolbar({
 
                     {/* Alignment */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">ALIGNMENT</p>
-                      <div className="grid grid-cols-3 gap-2">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Alignment</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         <Button
                           size="sm"
                           variant={editor.isActive({ textAlign: "right" }) ? "default" : "outline"}
@@ -672,7 +673,7 @@ export function TiptapToolbar({
 
                     {/* Chart & Image */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">MEDIA</p>
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Media</p>
                       <div className="grid grid-cols-2 gap-2">
                         <Button
                           size="sm"
@@ -703,8 +704,8 @@ export function TiptapToolbar({
 
                     {/* Link */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">INSERT</p>
-                      <div className="space-y-2">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Insert</p>
+                      <div className="space-y-2 sm:space-y-3">
                         <input
                           type="url"
                           value={linkUrl}
@@ -741,14 +742,14 @@ export function TiptapToolbar({
 
                     {/* Font Family */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">FONT FAMILY</p>
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Font Family</p>
                       <select
                         value={fontFamily}
                         onChange={(e) => {
                           onFontFamilyChange(e.target.value);
                           setShowMoreTools(false);
                         }}
-                        className="w-full px-3 py-2 text-sm border rounded-lg bg-white"
+                        className="w-full px-3 py-2.5 text-sm border rounded-lg bg-white focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition"
                       >
                         <option value="Arial">Arial</option>
                         <option value="Helvetica">Helvetica</option>
@@ -760,13 +761,16 @@ export function TiptapToolbar({
 
                     {/* Background Color */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-500 mb-2">BACKGROUND COLOR</p>
-                      <input
-                        type="color"
-                        value={backgroundColor}
-                        onChange={(e) => onBackgroundColorChange(e.target.value)}
-                        className="w-full h-12 border-2 rounded-lg cursor-pointer"
-                      />
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2 tracking-wide">Background Color</p>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={backgroundColor}
+                          onChange={(e) => onBackgroundColorChange(e.target.value)}
+                          className="flex-1 h-12 border-2 rounded-lg cursor-pointer"
+                        />
+                        <div className="text-xs text-gray-500 font-mono">{backgroundColor}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
