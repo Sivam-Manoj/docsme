@@ -13,6 +13,7 @@ import {
   Heading3,
   List,
   ListOrdered,
+  ListTodo,
   Quote,
   Undo,
   Redo,
@@ -298,6 +299,15 @@ export function TiptapToolbar({
               className="h-8 w-8 p-0"
             >
               <ListOrdered className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant={editor.isActive("taskList") ? "default" : "ghost"}
+              onClick={() => editor.chain().focus().toggleTaskList().run()}
+              title="Task List"
+              className="h-8 w-8 p-0"
+            >
+              <ListTodo className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Button>
             <Button
               size="sm"

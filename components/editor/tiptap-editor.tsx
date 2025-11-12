@@ -138,6 +138,9 @@ export function TiptapEditor({
       TaskList,
       TaskItem.configure({
         nested: true,
+        HTMLAttributes: {
+          class: 'task-item',
+        },
       }),
       Highlight.configure({
         multicolor: true,

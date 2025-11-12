@@ -76,6 +76,11 @@ export async function POST(req: NextRequest) {
     - Use modern CSS with gradients (linear-gradient), shadows, borders, and colors.
     - Make charts visually appealing with violet/purple/pink color schemes.
     
+    **TASK LISTS (for action items, checklists, todos):**
+    - Use interactive task lists for action items, checklists, to-dos, or step-by-step instructions
+    - Format: <ul data-type="taskList"><li data-type="taskItem" data-checked="true/false">Task description</li></ul>
+    - Users can check/uncheck these tasks interactively
+    
     **CHART FORMAT EXAMPLES:**
     For data visualization, create charts like this:
     <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">

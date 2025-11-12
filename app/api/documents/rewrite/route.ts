@@ -44,6 +44,11 @@ IMPORTANT: Return the content in Markdown format that supports:
 - Create bar charts, progress indicators, or styled data tables when appropriate
 - Use violet/purple/pink color schemes for professional look
 
+**TASK LISTS:**
+- For action items, checklists, or to-dos, use interactive task lists
+- Format: <ul data-type="taskList"><li data-type="taskItem" data-checked="true/false">Task description</li></ul>
+- Users can check/uncheck tasks for collaboration
+
 **Example chart format (use when data is present):**
 <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 16px 0; max-width: 600px;">
   <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 16px;">Chart Title</h3>
