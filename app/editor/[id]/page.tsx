@@ -606,10 +606,10 @@ export default function EditorPage({
           <button
             onClick={() => setShowAIPanel(true)}
             className="hidden lg:flex fixed bottom-6 right-6 z-30 px-4 h-11 items-center gap-2 rounded-full bg-gray-900 text-white shadow-xl hover:bg-gray-800"
-            aria-label="Open AI Assistant"
+            aria-label="Open AI Rewrite"
           >
             <Sparkles className="w-5 h-5 text-violet-300" />
-            <span className="text-sm font-medium">AI Assistant</span>
+            <span className="text-sm font-medium">Rewrite with AI</span>
           </button>
         )}
 
@@ -626,7 +626,13 @@ export default function EditorPage({
               <div className="sticky top-0 bg-linear-to-r from-violet-600 to-purple-600 text-white p-4 flex items-center justify-between">
                 <h2 className="font-bold flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  AI Assistant
+                  <span>Rewrite with AI</span>
+                  <button
+                    title="Select any text in your document to rewrite, improve, expand, or transform it using AI. The AI will help you enhance your content based on your instructions."
+                    className="text-white/70 hover:text-white transition-colors"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
                 </h2>
                 <button
                   onClick={() => setShowAIPanel(false)}

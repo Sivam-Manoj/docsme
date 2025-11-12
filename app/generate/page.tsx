@@ -279,18 +279,17 @@ export default function GeneratePage() {
                   setTimeout(() => {
                     if (streamingViewRef.current) {
                       const element = streamingViewRef.current;
-                      const targetScroll =
-                        element.scrollHeight - element.clientHeight;
-                      const currentScroll = element.scrollTop;
-                      const distance = targetScroll - currentScroll;
-
-                      // Smooth scroll to bottom
+                      const scrollHeight = element.scrollHeight;
+                      const clientHeight = element.clientHeight;
+                      // Keep content centered: scroll to show last line in middle
+                      const targetScroll = Math.max(0, scrollHeight - clientHeight / 2);
+                      
                       element.scrollTo({
                         top: targetScroll,
-                        behavior: distance > 500 ? "auto" : "smooth",
+                        behavior: "smooth",
                       });
                     }
-                  }, 50);
+                  }, 150);
                 }
               }
 
@@ -310,18 +309,16 @@ export default function GeneratePage() {
                   setTimeout(() => {
                     if (streamingViewRef.current) {
                       const element = streamingViewRef.current;
-                      // Calculate target: keep some margin from bottom to see what's being written
                       const scrollHeight = element.scrollHeight;
                       const clientHeight = element.clientHeight;
                       const currentScroll = element.scrollTop;
-                      const maxScroll = scrollHeight - clientHeight;
-
-                      // Target scroll position: leave ~100px margin to see content being written
-                      const targetScroll = Math.max(0, maxScroll - 100);
+                      
+                      // Keep last line centered vertically
+                      const targetScroll = Math.max(0, scrollHeight - clientHeight / 2);
                       const distance = Math.abs(targetScroll - currentScroll);
 
-                      // Only scroll if we're not already near the target
-                      if (distance > 50) {
+                      // Only scroll if we're not already near the target (reduced sensitivity)
+                      if (distance > 30) {
                         element.scrollTo({
                           top: targetScroll,
                           behavior: distance > 500 ? "auto" : "smooth",
@@ -625,9 +622,9 @@ export default function GeneratePage() {
           // Streaming View
           <motion.div
             key="streaming-view"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-5xl h-[85vh] sm:h-[90vh] md:h-[85vh] overflow-hidden flex flex-col"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-violet-100 w-full max-w-4xl h-[70vh] sm:h-[75vh] md:h-[70vh] overflow-hidden flex flex-col mt-8 sm:mt-12 md:mt-16"
           >
             {/* Header - Mobile Optimized */}
             <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 shrink-0">
@@ -661,7 +658,22 @@ export default function GeneratePage() {
                 {/* Controls - Better Touch Targets */}
                 <div className="flex items-center gap-2 shrink-0">
                   {generatedDocId ? (
-                    <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-green-400" />
+                    <>
+                      <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-green-400" />
+                      <button
+                        onClick={() => {
+                          setIsGenerating(false);
+                          setStreamingContent("");
+                          setReasoningSummary("");
+                          setGeneratedDocId("");
+                          setCharacterCount(0);
+                        }}
+                        className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all active:scale-95"
+                        title="Close"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </>
                   ) : (
                     <>
                       {/* Auto-scroll toggle button - Icon only on mobile */}
@@ -674,8 +686,8 @@ export default function GeneratePage() {
                         } active:scale-95`}
                         title={
                           autoScroll
-                            ? "Auto-scroll is On"
-                            : "Auto-scroll is Off"
+                            ? "Auto-scroll is On - Click to disable"
+                            : "Auto-scroll is Off - Click to enable"
                         }
                       >
                         <ScrollText className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4" />
