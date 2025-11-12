@@ -22,7 +22,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
 import { useEffect } from "react";
-import "./tiptap-styles.css";
+import "../editor/tiptap-styles.css";
 
 const lowlight = createLowlight(common);
 
