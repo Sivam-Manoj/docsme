@@ -167,6 +167,19 @@ export default function EditorPage({
     setIsSaved(false);
   }, [document?.content, document?.title]);
 
+  const handleSelectAllText = () => {
+    if (editorInstance) {
+      editorInstance.commands.selectAll();
+      const allText = editorInstance.getText();
+      setSelectedText(allText);
+    }
+  };
+
+  const handleCancelRewrite = () => {
+    setIsRewriting(false);
+    setShowAIPanel(false);
+  };
+
   const handleAIRewrite = async (instruction: string) => {
     if (!document) return;
 
@@ -304,10 +317,14 @@ export default function EditorPage({
         scale: isMobile ? 1.5 : 2, // Lower scale on mobile to avoid memory issues
         useCORS: true,
         allowTaint: true,
-        backgroundColor: document.styling?.backgroundColor || "#ffffff",
+        backgroundColor: "#ffffff",
         logging: false,
         removeContainer: false, // Keep container for cleanup
         imageTimeout: 0,
+        windowWidth: element.offsetWidth + 80, // Add extra width for padding
+        windowHeight: element.offsetHeight + 80, // Add extra height for padding
+        x: -40, // Offset to center content with padding
+        y: -40,
         ignoreElements: (element) => {
           return element.classList?.contains('no-print') || false;
         },
@@ -319,6 +336,8 @@ export default function EditorPage({
             elem.style.border = 'none';
             elem.style.outline = 'none';
             elem.style.boxShadow = 'none';
+            elem.style.padding = '40px'; // Add white padding around content
+            elem.style.backgroundColor = '#ffffff';
             
             // Remove borders and shadows from ProseMirror editor
             const prosemirror = elem.querySelector('.ProseMirror');
@@ -326,6 +345,7 @@ export default function EditorPage({
               (prosemirror as HTMLElement).style.border = 'none';
               (prosemirror as HTMLElement).style.outline = 'none';
               (prosemirror as HTMLElement).style.boxShadow = 'none';
+              (prosemirror as HTMLElement).style.padding = '0';
             }
             
             // Remove shadow-lg and borders from all children (especially the editor wrapper)
@@ -597,6 +617,8 @@ export default function EditorPage({
                   selectedText={selectedText}
                   isRewriting={isRewriting}
                   onRewrite={handleAIRewrite}
+                  onSelectAll={handleSelectAllText}
+                  onCancel={handleCancelRewrite}
                 />
               </div>
             </div>
@@ -657,6 +679,8 @@ export default function EditorPage({
                   selectedText={selectedText}
                   isRewriting={isRewriting}
                   onRewrite={handleAIRewrite}
+                  onSelectAll={handleSelectAllText}
+                  onCancel={handleCancelRewrite}
                 />
               </div>
             </div>

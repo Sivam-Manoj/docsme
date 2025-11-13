@@ -11,6 +11,9 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
   List,
   ListOrdered,
   ListTodo,
@@ -67,6 +70,9 @@ export function TiptapToolbar({
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [showMoreTools, setShowMoreTools] = useState(false);
+  const [showTextColor, setShowTextColor] = useState(false);
+  const [showFontSize, setShowFontSize] = useState(false);
+  const [showFontFamily, setShowFontFamily] = useState(false);
 
   if (!editor) {
     return null;
@@ -91,6 +97,48 @@ export function TiptapToolbar({
   const removeLink = () => {
     editor.chain().focus().unsetLink().run();
   };
+
+  const setTextColor = (color: string) => {
+    const { from, to } = editor.state.selection;
+    if (from !== to) {
+      editor.chain().focus().setColor(color).run();
+    }
+    setShowTextColor(false);
+  };
+
+  const setSelectedFontSize = (size: number) => {
+    const { from, to } = editor.state.selection;
+    if (from !== to) {
+      editor.chain().focus().setMark('textStyle', { fontSize: size }).run();
+    }
+    setShowFontSize(false);
+  };
+
+  const setSelectedFontFamily = (family: string) => {
+    const { from, to } = editor.state.selection;
+    if (from !== to) {
+      editor.chain().focus().setFontFamily(family).run();
+    }
+    setShowFontFamily(false);
+  };
+
+  const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+  const fontFamilies = [
+    'Arial',
+    'Times New Roman',
+    'Courier New',
+    'Georgia',
+    'Verdana',
+    'Helvetica',
+    'Comic Sans MS',
+    'Trebuchet MS',
+    'Impact',
+  ];
+  const textColors = [
+    '#000000', '#374151', '#6B7280', '#EF4444', '#F97316',
+    '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#8B5CF6',
+    '#EC4899', '#FFFFFF'
+  ];
 
   return (
     <div className="border-b border-gray-200 bg-white">
@@ -243,6 +291,109 @@ export function TiptapToolbar({
                         Remove
                       </Button>
                     </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Text Formatting - Color, Size, Font (hidden on mobile) */}
+          <div className="hidden md:flex items-center gap-0.5 sm:gap-1 border-r pr-1 sm:pr-2">
+            {/* Text Color */}
+            <div className="relative">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowTextColor(!showTextColor)}
+                title="Text Color"
+                className="h-8 w-8 p-0"
+              >
+                <Palette className="w-4 h-4" />
+              </Button>
+              {showTextColor && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowTextColor(false)}
+                  />
+                  <div className="absolute top-10 left-0 z-50 bg-white p-3 rounded-lg shadow-xl border min-w-[200px]">
+                    <p className="text-xs font-semibold text-gray-600 mb-2">Text Color</p>
+                    <div className="grid grid-cols-6 gap-2">
+                      {textColors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => setTextColor(color)}
+                          className="w-6 h-6 rounded border-2 border-gray-300 hover:scale-110 transition-transform"
+                          style={{ backgroundColor: color }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Font Size */}
+            <div className="relative">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowFontSize(!showFontSize)}
+                title="Font Size"
+                className="h-8 w-8 p-0"
+              >
+                <Type className="w-4 h-4" />
+              </Button>
+              {showFontSize && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowFontSize(false)}
+                  />
+                  <div className="absolute top-10 left-0 z-50 bg-white rounded-lg shadow-xl border max-h-64 overflow-y-auto">
+                    {fontSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedFontSize(size)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
+                      >
+                        {size}px
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Font Family */}
+            <div className="relative">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowFontFamily(!showFontFamily)}
+                title="Font Family"
+                className="h-8 px-2 text-xs"
+              >
+                Aa
+              </Button>
+              {showFontFamily && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowFontFamily(false)}
+                  />
+                  <div className="absolute top-10 left-0 z-50 bg-white rounded-lg shadow-xl border max-h-64 overflow-y-auto min-w-[180px]">
+                    {fontFamilies.map((font) => (
+                      <button
+                        key={font}
+                        onClick={() => setSelectedFontFamily(font)}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
+                        style={{ fontFamily: font }}
+                      >
+                        {font}
+                      </button>
+                    ))}
                   </div>
                 </>
               )}
@@ -600,6 +751,42 @@ export function TiptapToolbar({
                         >
                           <Heading3 className="w-5 h-5" />
                           <span className="text-[10px]">Heading 3</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("heading", { level: 4 }) ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleHeading({ level: 4 }).run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Heading4 className="w-5 h-5" />
+                          <span className="text-[10px]">Heading 4</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("heading", { level: 5 }) ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleHeading({ level: 5 }).run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Heading5 className="w-5 h-5" />
+                          <span className="text-[10px]">Heading 5</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={editor.isActive("heading", { level: 6 }) ? "default" : "outline"}
+                          onClick={() => {
+                            editor.chain().focus().toggleHeading({ level: 6 }).run();
+                            setShowMoreTools(false);
+                          }}
+                          className="flex flex-col h-auto py-3 gap-1"
+                        >
+                          <Heading6 className="w-5 h-5" />
+                          <span className="text-[10px]">Heading 6</span>
                         </Button>
                         <Button
                           size="sm"

@@ -139,7 +139,25 @@ export function TiptapEditor({
       TableRow,
       TableHeader,
       TableCell,
-      TextStyle,
+      TextStyle.extend({
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            fontSize: {
+              default: null,
+              parseHTML: element => element.style.fontSize.replace('px', ''),
+              renderHTML: attributes => {
+                if (!attributes.fontSize) {
+                  return {};
+                }
+                return {
+                  style: `font-size: ${attributes.fontSize}px`,
+                };
+              },
+            },
+          };
+        },
+      }),
       Color,
       Underline,
       FontFamily,
@@ -225,24 +243,33 @@ export function TiptapEditor({
   const [showFontSize, setShowFontSize] = useState(false);
   const [showFontFamily, setShowFontFamily] = useState(false);
 
-  // Text formatting functions
+  // Text formatting functions - apply only to selected text
   const setTextColor = (color: string) => {
     if (editor) {
-      editor.chain().focus().setColor(color).run();
+      const { from, to } = editor.state.selection;
+      if (from !== to) { // Only if text is selected
+        editor.chain().focus().setColor(color).run();
+      }
       setShowTextColor(false);
     }
   };
 
   const setSelectedFontSize = (size: number) => {
     if (editor) {
-      editor.chain().focus().setMark('textStyle', { fontSize: `${size}px` }).run();
+      const { from, to } = editor.state.selection;
+      if (from !== to) { // Only if text is selected
+        editor.chain().focus().setMark('textStyle', { fontSize: size }).run();
+      }
       setShowFontSize(false);
     }
   };
 
   const setSelectedFontFamily = (family: string) => {
     if (editor) {
-      editor.chain().focus().setFontFamily(family).run();
+      const { from, to } = editor.state.selection;
+      if (from !== to) { // Only if text is selected
+        editor.chain().focus().setFontFamily(family).run();
+      }
       setShowFontFamily(false);
     }
   };
