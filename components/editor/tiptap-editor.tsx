@@ -220,16 +220,36 @@ export function TiptapEditor({
     }
   }, [fontSize, fontFamily, textColor, editor]);
 
-  if (!editor) {
-    return <div className="p-4 text-gray-400">Loading editor...</div>;
-  }
-
+  // State for bubble menu dropdowns - MUST be before any conditional returns
   const [showTextColor, setShowTextColor] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
   const [showFontFamily, setShowFontFamily] = useState(false);
 
+  // Text formatting functions
+  const setTextColor = (color: string) => {
+    if (editor) {
+      editor.chain().focus().setColor(color).run();
+      setShowTextColor(false);
+    }
+  };
+
+  const setSelectedFontSize = (size: number) => {
+    if (editor) {
+      editor.chain().focus().setMark('textStyle', { fontSize: `${size}px` }).run();
+      setShowFontSize(false);
+    }
+  };
+
+  const setSelectedFontFamily = (family: string) => {
+    if (editor) {
+      editor.chain().focus().setFontFamily(family).run();
+      setShowFontFamily(false);
+    }
+  };
+
   // Handle rewrite click
   const handleRewriteClick = () => {
+    if (!editor) return;
     const { from, to } = editor.state.selection;
     const selectedText = editor.state.doc.textBetween(from, to, " ");
     if (selectedText.trim() && onRewriteClick) {
@@ -237,22 +257,7 @@ export function TiptapEditor({
     }
   };
 
-  // Text formatting functions
-  const setTextColor = (color: string) => {
-    editor.chain().focus().setColor(color).run();
-    setShowTextColor(false);
-  };
-
-  const setSelectedFontSize = (size: number) => {
-    editor.chain().focus().setMark('textStyle', { fontSize: `${size}px` }).run();
-    setShowFontSize(false);
-  };
-
-  const setSelectedFontFamily = (family: string) => {
-    editor.chain().focus().setFontFamily(family).run();
-    setShowFontFamily(false);
-  };
-
+  // Constants for formatting options
   const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
   const fontFamilies = [
     'Arial',
@@ -270,6 +275,10 @@ export function TiptapEditor({
     '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#8B5CF6',
     '#EC4899', '#FFFFFF'
   ];
+
+  if (!editor) {
+    return <div className="p-4 text-gray-400">Loading editor...</div>;
+  }
 
   if (variant === "viewer") {
     return (
