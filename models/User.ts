@@ -16,6 +16,12 @@ export interface IUser extends Document {
     currentPeriodEnd?: Date;
   };
   documentsCreated: number;
+  uploadedImages?: Array<{
+    _id: string;
+    url: string;
+    filename: string;
+    uploadedAt: Date;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,6 +72,22 @@ const UserSchema: Schema = new Schema(
       type: Number,
       default: 0,
     },
+    uploadedImages: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        filename: {
+          type: String,
+          required: true,
+        },
+        uploadedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

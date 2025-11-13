@@ -16,6 +16,7 @@ import { TiptapToolbar } from "@/components/editor/tiptap-toolbar";
 import { EmailShareModal } from "@/components/editor/email-share-modal";
 import { ChartGenerator } from "@/components/editor/chart-generator";
 import { ImageUploader } from "@/components/editor/image-uploader";
+import { ImageGalleryModal } from "@/components/editor/image-gallery-modal";
 import { ContextMenu } from "@/components/editor/context-menu";
 
 interface DocumentData {
@@ -49,6 +50,7 @@ export default function EditorPage({
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showChartModal, setShowChartModal] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showImageGallery, setShowImageGallery] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
@@ -310,7 +312,7 @@ export default function EditorPage({
           return element.classList?.contains('no-print') || false;
         },
         onclone: (clonedDoc) => {
-          // Remove any borders from the cloned document
+          // Remove any borders and shadows from the cloned document
           const clonedContent = clonedDoc.querySelector('[data-pdf-content]');
           if (clonedContent) {
             const elem = clonedContent as HTMLElement;
@@ -318,23 +320,28 @@ export default function EditorPage({
             elem.style.outline = 'none';
             elem.style.boxShadow = 'none';
             
-            // Remove borders from ProseMirror editor
+            // Remove borders and shadows from ProseMirror editor
             const prosemirror = elem.querySelector('.ProseMirror');
             if (prosemirror) {
               (prosemirror as HTMLElement).style.border = 'none';
               (prosemirror as HTMLElement).style.outline = 'none';
+              (prosemirror as HTMLElement).style.boxShadow = 'none';
             }
             
-            // Remove borders from all children
+            // Remove shadow-lg and borders from all children (especially the editor wrapper)
             const allChildren = elem.querySelectorAll('*');
             allChildren.forEach((child) => {
               const el = child as HTMLElement;
-              if (el.style.border && el.style.border.includes('2px')) {
+              // Remove any border styles
+              if (el.style.border) {
                 el.style.border = 'none';
               }
               if (el.style.outline) {
                 el.style.outline = 'none';
               }
+              // Remove shadow classes and inline shadows
+              el.style.boxShadow = 'none';
+              el.classList.remove('shadow-lg', 'shadow-md', 'shadow-sm', 'shadow', 'shadow-xl', 'shadow-2xl');
             });
           }
         },
@@ -705,6 +712,21 @@ export default function EditorPage({
         <ImageUploader
           onInsert={handleInsertImage}
           onClose={() => setShowImageModal(false)}
+          onOpenGallery={() => {
+            setShowImageModal(false);
+            setShowImageGallery(true);
+          }}
+        />
+      )}
+
+      {/* Image Gallery Modal */}
+      {showImageGallery && (
+        <ImageGalleryModal
+          isOpen={showImageGallery}
+          onClose={() => setShowImageGallery(false)}
+          onSelectImage={(url) => {
+            handleInsertImage({ src: url, alt: "Image from gallery" });
+          }}
         />
       )}
 

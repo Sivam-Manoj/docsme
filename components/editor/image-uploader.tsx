@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -9,9 +9,10 @@ import Image from "next/image";
 interface ImageUploaderProps {
   onInsert: (imageData: { src: string; alt: string; caption?: string }) => void;
   onClose: () => void;
+  onOpenGallery?: () => void;
 }
 
-export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
+export function ImageUploader({ onInsert, onClose, onOpenGallery }: ImageUploaderProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [imageCaption, setImageCaption] = useState<string>("");
@@ -117,16 +118,40 @@ export function ImageUploader({ onInsert, onClose }: ImageUploaderProps) {
             />
             
             {!selectedImage || !imagePreview ? (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full px-6 py-8 border-2 border-dashed border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center gap-3"
-              >
-                <Upload className="w-12 h-12 text-blue-500" />
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-gray-700">Click to upload image</p>
-                  <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</p>
-                </div>
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full px-6 py-8 border-2 border-dashed border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center gap-3"
+                >
+                  <Upload className="w-12 h-12 text-blue-500" />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-gray-700">Click to upload new image</p>
+                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</p>
+                  </div>
+                </button>
+                {onOpenGallery && (
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                      <span className="bg-white px-2 text-gray-500">or</span>
+                    </div>
+                  </div>
+                )}
+                {onOpenGallery && (
+                  <button
+                    onClick={onOpenGallery}
+                    className="w-full px-6 py-4 border-2 border-violet-300 rounded-xl hover:border-violet-500 hover:bg-violet-50 transition-all flex items-center justify-center gap-3"
+                  >
+                    <Images className="w-6 h-6 text-violet-600" />
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-gray-700">Browse Gallery</p>
+                      <p className="text-xs text-gray-500">Choose from your uploaded images</p>
+                    </div>
+                  </button>
+                )}
+              </div>
             ) : (
               <div className="relative border-2 border-blue-300 rounded-xl overflow-hidden">
                 <Image

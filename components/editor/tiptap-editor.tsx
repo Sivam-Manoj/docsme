@@ -22,8 +22,8 @@ import Superscript from "@tiptap/extension-superscript";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import { Markdown } from "tiptap-markdown";
-import { useEffect } from "react";
-import { Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Sparkles, Type, Palette } from "lucide-react";
 import "./tiptap-styles.css";
 
 const lowlight = createLowlight(common);
@@ -224,6 +224,10 @@ export function TiptapEditor({
     return <div className="p-4 text-gray-400">Loading editor...</div>;
   }
 
+  const [showTextColor, setShowTextColor] = useState(false);
+  const [showFontSize, setShowFontSize] = useState(false);
+  const [showFontFamily, setShowFontFamily] = useState(false);
+
   // Handle rewrite click
   const handleRewriteClick = () => {
     const { from, to } = editor.state.selection;
@@ -232,6 +236,40 @@ export function TiptapEditor({
       onRewriteClick(selectedText);
     }
   };
+
+  // Text formatting functions
+  const setTextColor = (color: string) => {
+    editor.chain().focus().setColor(color).run();
+    setShowTextColor(false);
+  };
+
+  const setSelectedFontSize = (size: number) => {
+    editor.chain().focus().setMark('textStyle', { fontSize: `${size}px` }).run();
+    setShowFontSize(false);
+  };
+
+  const setSelectedFontFamily = (family: string) => {
+    editor.chain().focus().setFontFamily(family).run();
+    setShowFontFamily(false);
+  };
+
+  const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+  const fontFamilies = [
+    'Arial',
+    'Times New Roman',
+    'Courier New',
+    'Georgia',
+    'Verdana',
+    'Helvetica',
+    'Comic Sans MS',
+    'Trebuchet MS',
+    'Impact',
+  ];
+  const textColors = [
+    '#000000', '#374151', '#6B7280', '#EF4444', '#F97316',
+    '#F59E0B', '#10B981', '#06B6D4', '#3B82F6', '#8B5CF6',
+    '#EC4899', '#FFFFFF'
+  ];
 
   if (variant === "viewer") {
     return (
@@ -247,16 +285,111 @@ export function TiptapEditor({
       {editable && editor && (
         <BubbleMenu
           editor={editor}
-          className="bg-white rounded-lg shadow-lg border border-gray-200 px-2 py-1 flex items-center gap-1 z-50"
+          className="bg-white rounded-lg shadow-lg border border-gray-200 p-2 z-50"
         >
-          <button
-            onClick={handleRewriteClick}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-violet-600 hover:bg-violet-50 rounded-md transition-colors"
-            title="Rewrite with AI"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Rewrite with AI</span>
-          </button>
+          <div className="flex items-center gap-1">
+            {/* AI Rewrite Button */}
+            <button
+              onClick={handleRewriteClick}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-violet-600 hover:bg-violet-50 rounded-md transition-colors"
+              title="Rewrite with AI"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>AI</span>
+            </button>
+
+            <div className="w-px h-5 bg-gray-200" />
+
+            {/* Text Color */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowTextColor(!showTextColor);
+                  setShowFontSize(false);
+                  setShowFontFamily(false);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium hover:bg-gray-100 rounded-md transition-colors"
+                title="Text Color"
+              >
+                <Palette className="w-3.5 h-3.5" />
+                <span>Color</span>
+              </button>
+              {showTextColor && (
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 p-2 z-[60]">
+                  <div className="grid grid-cols-6 gap-1 w-[156px]">
+                    {textColors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setTextColor(color)}
+                        className="w-6 h-6 rounded border-2 border-gray-300 hover:border-violet-500 transition-colors"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Font Size */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowFontSize(!showFontSize);
+                  setShowTextColor(false);
+                  setShowFontFamily(false);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium hover:bg-gray-100 rounded-md transition-colors"
+                title="Font Size"
+              >
+                <Type className="w-3.5 h-3.5" />
+                <span>Size</span>
+              </button>
+              {showFontSize && (
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 p-1 z-[60] max-h-64 overflow-y-auto">
+                  {fontSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedFontSize(size)}
+                      className="block w-full text-left px-3 py-1.5 text-sm hover:bg-violet-50 rounded transition-colors whitespace-nowrap"
+                    >
+                      {size}px
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Font Family */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowFontFamily(!showFontFamily);
+                  setShowTextColor(false);
+                  setShowFontSize(false);
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium hover:bg-gray-100 rounded-md transition-colors"
+                title="Font Family"
+              >
+                <Type className="w-3.5 h-3.5" />
+                <span>Font</span>
+              </button>
+              {showFontFamily && (
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 p-1 z-[60] max-h-64 overflow-y-auto min-w-[160px]">
+                  {fontFamilies.map((family) => (
+                    <button
+                      key={family}
+                      onClick={() => setSelectedFontFamily(family)}
+                      className="block w-full text-left px-3 py-1.5 text-sm hover:bg-violet-50 rounded transition-colors whitespace-nowrap"
+                      style={{ fontFamily: family }}
+                    >
+                      {family}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </BubbleMenu>
       )}
       <div className="tiptap-editor-wrapper h-full overflow-y-auto bg-gray-100 p-1 sm:p-4">
